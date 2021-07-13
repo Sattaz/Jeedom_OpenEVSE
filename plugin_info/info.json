@@ -1,0 +1,16 @@
+{
+	"id" : "OpenEVSE",
+	"name" : "OpenEVSE",
+	"description" : "Plugin pour piloter une borne de charge OpenEVSE/EmonEVSE",
+	"licence" : "AGPL",
+	"author" : "Sébastien Spangenberger",
+	"require" : "3.2",
+	"category" : "monitoring",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "https://github.com/Sattaz/OpenEVSE/blob/master/OpenEVSE/docs/fr_FR/changelog.md",
+	"documentation" : "https://github.com/Sattaz/OpenEVSE/blob/master/OpenEVSE/docs/fr_FR/index.md",
+	"language" : "fr_FR",
+	"compatibility" : ""
+}
