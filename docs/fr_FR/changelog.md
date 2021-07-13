@@ -1,1 +1,0 @@
-Première version du plugin.
