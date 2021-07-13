@@ -26,6 +26,7 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 -   Ampérage de charge maximum (A) : veuillez renseigner l'ampérage maximum que le chargeur ne doit pas dépasser, ceci en fonction de votre installation/abonnement électrique (en ampères)
 
 -> Veuillez dès à présent appuyer sur le bouton 'Sauvegarder' afin d'enregistrer la configuration.
+
 -> Cette action va automatiquement créer les commandes de l'équipement.
 
 Commandes de l'équipement 
