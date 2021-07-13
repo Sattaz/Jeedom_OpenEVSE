@@ -14,7 +14,7 @@ Configuration du plugin
 La configuration du plugin est très simple.
 Une fois installé, il suffit de créer un nouvel équipement et de le configurer de la manière suivantes:
 
-![OpenEVSE](https://sattaz.github.io/Jeedom_OpenEVSE/pictures/OpenEVSE_1.jpg)
+
 
 Comme pour chaque plugin Jeedom, il faudra indiquer le 'Nom de l'équipement', un 'Objet parent' et une 'Catégorie'.
 Ne pas oublier de cocher les cases 'Activer' et 'Visible'.
