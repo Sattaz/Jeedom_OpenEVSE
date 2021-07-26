@@ -9,8 +9,8 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://github.com/Sattaz/OpenEVSE/blob/master/OpenEVSE/docs/fr_FR/changelog.md",
-	"documentation" : "https://github.com/Sattaz/OpenEVSE/blob/master/OpenEVSE/docs/fr_FR/index.md",
+	"changelog" : "https://sattaz.github.io/Jeedom_OpenEVSE/fr_FR/changelog",
+	"documentation" : "https://sattaz.github.io/Jeedom_OpenEVSE/fr_FR/",
 	"language" : "fr_FR",
 	"compatibility" : ""
 }
