@@ -12,5 +12,5 @@
 	"changelog" : "https://sattaz.github.io/Jeedom_OpenEVSE/fr_FR/changelog",
 	"documentation" : "https://sattaz.github.io/Jeedom_OpenEVSE/fr_FR/",
 	"language" : "fr_FR",
-	"compatibility" : ""
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","v4"]
 }
