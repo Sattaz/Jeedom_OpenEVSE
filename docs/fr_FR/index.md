@@ -3,7 +3,7 @@ Description
 
 Le plugin OpenEVSE permet de piloter un chargeur de voiture électrique OpenEVSE ou EmonEVSE.
 
-En application courante, il permet par exemple de demarrer ou arreter une charge manuellement mais encore d'ajuster automatiquement la puissance de charge en fonction de la puissance réelle générée par une installation PV depuis un scénario dans Jeedom.
+En application courante, il permet par exemple de démarrer ou arrêter une charge manuellement mais encore d'ajuster automatiquement la puissance de charge en fonction de la puissance réelle générée par une installation photovoltaïque depuis un scénario dans Jeedom.
 
 Le chargeur est disponible ici:
 https://shop.openenergymonitor.com/emonevse-wifi-connected-ev-charging-station-type-2/
@@ -36,6 +36,9 @@ Comme énoncé dans le précédent chapitre, les commandes de l'équipement sont
 
 ![OpenEVSE](https://sattaz.github.io/Jeedom_OpenEVSE/pictures/OpenEVSE_2.jpg)
 
+Informations pratiques:
+-> Les commandes 'Perso. Texte' et 'Perso. Num.' peuvent etre utilisée comme bon vous semble afin, par exemple, d'afficher des informations que vous obtiendrez depuis un scénario et les afficher sur la tuile du plugin.
+
 Le widget 
 ===
 
@@ -44,6 +47,14 @@ Le widget arrive comme montré sur la photo ci-après et le curseur permettant l
 ![OpenEVSE](https://sattaz.github.io/Jeedom_OpenEVSE/pictures/OpenEVSE_3.jpg)
 
 Libre à vous de modifier le widget afin de l'adapter à votre style de présentation.
+
+Informations pratiques:
+-> Les boutons 'Start' et 'Stop' permettent de démarrer ou arrêter une charge.
+-> Les boutons 'Man.' et 'Auto.' n'ont aucun effet direct avec le chargeur, ils permettent simplement de changer l'information 'Mode' du plugin en 'Manuel' ou 'Automatique'.
+   Vous pouvez donc utiliser un scenario depuis Jeedom afin d'interragir de facon différente en fonction du 'Mode' du plugin:
+   * En 'Manuel', le scénario pourra par exemple ignorer tout automatisme et donc laisser l'utilisateur démarrer ou arrêter une charge avec les boutons 'Start' et 'Stop' manuellement.
+   * En 'Automatique', le scénario pourra par exemple utiliser une information de puissance produite par une installation photovoltaïque et interragir avec le plugin en ajustant la consigne d'ampérage de charge, démarrer une session de charge en executant la commande 'Start', arrêter une session de charge en executant la commande 'Stop' ou encore faire tout cela pendant les heures creuses en ajustant l'ampérage de charge au maximum.
+   Bref, les possibilités sont multiples.
 
 Autres informations 
 ===
