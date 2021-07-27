@@ -8,6 +8,12 @@ En application courante, il permet par exemple de démarrer ou arrêter une char
 Le chargeur est disponible ici:
 https://shop.openenergymonitor.com/emonevse-wifi-connected-ev-charging-station-type-2/
 
+Remarques:
+
+- La borne existe en monophasé et en triphasé.
+
+- La borne OpenEVSE peut varier l’intensité de charge de 6 a 32 ampères.
+
 Configuration du plugin 
 ===
 
@@ -51,12 +57,12 @@ Libre à vous de modifier le widget afin de l'adapter à votre style de présent
 
 Informations pratiques:
 
--> Les boutons 'Start' et 'Stop' permettent de démarrer ou arrêter une charge.
+-> Les boutons 'ON' et 'OFF' permettent de démarrer ou arrêter une charge.
 
 -> Les boutons 'Man.' et 'Auto.' n'ont aucun effet direct avec le chargeur, ils permettent simplement de changer l'information 'Mode' du plugin en 'Manuel' ou 'Automatique'.
    Vous pouvez donc utiliser un scenario depuis Jeedom afin d'interragir de facon différente en fonction du 'Mode' du plugin:
 
-* En 'Manuel', le scénario pourra par exemple ignorer tout automatisme et donc laisser l'utilisateur démarrer ou arrêter une charge avec les boutons 'Start' et 'Stop' manuellement.
+* En 'Manuel', le scénario pourra par exemple ignorer tout automatisme et donc laisser l'utilisateur démarrer ou arrêter une charge avec les boutons 'ON' et 'OFF' manuellement.
 
 * En 'Automatique', le scénario pourra par exemple utiliser une information de puissance produite par une installation photovoltaïque et interragir avec le plugin en ajustant la consigne d'ampérage de charge, démarrer une session de charge en executant la commande 'Start', arrêter une session de charge en executant la commande 'Stop' ou encore faire tout cela pendant les heures creuses en ajustant l'ampérage de charge au maximum.
 
