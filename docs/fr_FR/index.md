@@ -6,7 +6,8 @@ Le plugin OpenEVSE permet de piloter un chargeur de voiture électrique OpenEVSE
 En application courante, il permet par exemple de démarrer ou arrêter une charge manuellement mais encore d'ajuster automatiquement la puissance de charge en fonction de la puissance réelle générée par une installation photovoltaïque depuis un scénario dans Jeedom.
 
 Le chargeur est disponible ici:
-https://shop.openenergymonitor.com/emonevse-wifi-connected-ev-charging-station-type-2/
+[Lien vers le chargeur EmonEVSE de chez OpenEnergyMonitor](https://shop.openenergymonitor.com/emonevse-wifi-connected-ev-charging-station-type-2/)
+
 
 Remarques:
 
