@@ -50,12 +50,17 @@ class OpenEVSE extends eqLogic {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$SC%20'.$valueSlider);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 1000);
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL ').curl_error($ch);
+			} else {
+				log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Changement valeur curseur à '.$valueSlider.' ampères');
+			}
 			curl_close($ch);
-			log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Lancement/Ok' );
 			return $valueSlider ;
 		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint '  . ' ' . $e->getMessage()));
+			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint ' . ' ' . $e->getMessage()));
 		}
 	}
 	
@@ -65,6 +70,7 @@ class OpenEVSE extends eqLogic {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$FD');
+			curl_setopt($ch, CURLOPT_TIMEOUT, 1000);
 			switch ($StartStop) {
 				case ('Start'):
 					curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$FE');
@@ -74,11 +80,15 @@ class OpenEVSE extends eqLogic {
 					break;
 			}
 			curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL ').curl_error($ch);
+			} else {
+				log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop);
+			}
 			curl_close($ch);
-			log::add('OpenEVSE', 'debug','Fonction SetStartStop : Lancement/Ok' );
 			return;
 		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop '  . ' ' . $e->getMessage()));
+			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
 		}
 	}
 	
@@ -92,10 +102,10 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_Mode', 'Automatique');
 					break;
 			}
-			log::add('OpenEVSE', 'debug','Fonction SetMode : Ok' );
+			log::add('OpenEVSE', 'debug','Fonction SetMode : Changement valeur à '.$SelMode);
 			return;
 		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetMode '  . ' ' . $e->getMessage()));
+			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetMode ' . ' ' . $e->getMessage()));
 		}
 	}
 
@@ -115,10 +125,15 @@ class OpenEVSE extends eqLogic {
 			$OpenEVSE_IP = $this->getConfiguration("IP");
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 1000);
 			
 			// Get OpenEVSE State
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GS');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - State : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
 		
@@ -141,19 +156,35 @@ class OpenEVSE extends eqLogic {
 			// Get OpenEVSE Amperes Set Point
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GC');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
-			$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', round($arr[2],0));
+			$setPointEVSE = round($arr[2],0);
+			$cmd = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
+			$setPointCMD = $cmd->execCmd();
 			
-			//Refresh position of the slider
-			$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-			$options = array('slider'=>round($arr[2],0));
-			$cmdAmpSetPointSlider->execCmd($options, $cache=0);
-			
-						
+			if ($setPointEVSE != $setPointCMD) {
+				// Set AmpSetPointReadBack value
+				$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
+				//Refresh position of the slider
+				$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
+				$options = array('slider'=>round($arr[2],0));
+				$cmdAmpSetPointSlider->execCmd($options, $cache=0);
+				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Rafraîchissement valeur set point à '.$setPointEVSE);
+			} else {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Check valeur set point EVSE vs Plugin OK');
+			}
+									
 			// Get OpenEVSE Temperature
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GP');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Temperature : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
 			$this->checkAndUpdateCmd('EVSE_Temp', round($arr[1]/10,0));
@@ -161,6 +192,10 @@ class OpenEVSE extends eqLogic {
 			// Get OpenEVSE Actual Volts & Amperes
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GG');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Volts-Amperes : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
 			$this->checkAndUpdateCmd('EVSE_Amperes', round($arr[0]/1000,1));
@@ -169,6 +204,10 @@ class OpenEVSE extends eqLogic {
 			//Get OpenEVSE Plug State
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$G0');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Plug State : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
 			if ($arr[0] == 0) {
@@ -182,16 +221,20 @@ class OpenEVSE extends eqLogic {
 			// Get OpenEVSE Charge Session in Kwh
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GU');
 			$data = curl_exec($ch);
+			if (curl_errno($ch)) {
+				log::add('OpenEVSE', 'debug','Fonction GetData - Charge Session : Erreur CURL '.curl_error($ch));
+				return;
+			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
 			$this->checkAndUpdateCmd('EVSE_ChargeSession', round($arr[0]/3600000,2));
 			
 			curl_close($ch);
 
-			log::add('OpenEVSE', 'debug','Fonction GetData : Lancement/Ok' );
+			log::add('OpenEVSE', 'debug','Fonction GetData : Récupération des données OpenEVSE OK!' );
 			return;
 		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de GetData '  . ' ' . $e->getMessage()));
+			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de GetData ' . ' ' . $e->getMessage()));
 		}
 	}
     
@@ -569,5 +612,3 @@ class OpenEVSECmd extends cmd {
     }
     /*     * **********************Getteur Setteur*************************** */
 }
-
-
