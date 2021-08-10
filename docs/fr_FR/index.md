@@ -30,7 +30,9 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 
 -   IP de la borne : veuillez renseigner l'adresse IP de l'interface web du chargeur OpenEVSE/EmonEVSE.
 
--   Ampérage de charge maximum (A) : veuillez renseigner l'ampérage maximum que le chargeur ne doit pas dépasser, ceci en fonction de votre installation/abonnement électrique (en ampères)
+-   Intensité de charge maximum (A) : veuillez sélectionner l'ampérage maximum que le chargeur ne doit pas dépasser, ceci en fonction de votre installation/abonnement électrique (en ampères)
+
+-   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique ou renseigner une commande de typer information, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
 
 -> Veuillez dès à présent appuyer sur le bouton 'Sauvegarder' afin d'enregistrer la configuration.
 
@@ -65,7 +67,7 @@ Informations pratiques:
 
 * En 'Manuel', le scénario pourra par exemple ignorer tout automatisme et donc laisser l'utilisateur démarrer ou arrêter une charge avec les boutons 'ON' et 'OFF' manuellement.
 
-* En 'Automatique', le scénario pourra par exemple utiliser une information de puissance produite par une installation photovoltaïque et interragir avec le plugin en ajustant la consigne d'ampérage de charge, démarrer une session de charge en executant la commande 'Start', arrêter une session de charge en executant la commande 'Stop' ou encore faire tout cela pendant les heures creuses en ajustant l'ampérage de charge au maximum.
+* En 'Automatique', le scénario pourra par exemple utiliser une information de puissance produite par une installation photovoltaïque et interragir avec le plugin en ajustant la consigne d'ampérage de charge, démarrer une session de charge en executant la commande 'ON', arrêter une session de charge en executant la commande 'OFF' ou encore faire tout cela pendant les heures creuses en ajustant l'ampérage de charge au maximum.
 
 Bref, les possibilités sont multiples.
 
