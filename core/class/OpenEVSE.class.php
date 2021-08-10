@@ -37,13 +37,6 @@ class OpenEVSE extends eqLogic {
 		}
     }
 	
-	// Public function Update() {
-		// try {
-			// log::add('OpenEVSE', 'debug','Function Update : Lancement');
-		
-		// }
-	// }
-
 	public function SetSliderSetPoint($valueSlider) {
 		try {
 			$OpenEVSE_IP = $this->getConfiguration("IP");
@@ -118,6 +111,31 @@ class OpenEVSE extends eqLogic {
 		return substr($string, $ini, $len);
 	}
 	
+	public function SetVoltageRef($RefVolts) {
+		try {
+			$RefVolts = round($RefVolts,0);
+			if ($RefVolts < 0 || $RefVolts > 500) {
+				log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Référence voltage depuis la commande spécifiée est incorrecte : '.$RefVolts);
+			} else {
+				$setpointVolts = $RefVolts * 1000;
+				$OpenEVSE_IP = $this->getConfiguration("IP");
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_TIMEOUT, 1000);
+				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts);
+				$data = curl_exec($ch);
+				if (curl_errno($ch)) {
+					log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : RefVolts -> Erreur CURL ').curl_error($ch);
+				} else {
+					log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : RefVolts -> Changement référence voltage à '.$RefVolts.' volts');
+				}
+				curl_close($ch);
+			}
+		} catch (Exception $e) {
+			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetVoltageRef ' . ' ' . $e->getMessage()));
+		}			
+	}
+	
 	public function GetData() {
 		
 		try {
@@ -131,7 +149,7 @@ class OpenEVSE extends eqLogic {
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GS');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - State : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : State -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
@@ -157,7 +175,7 @@ class OpenEVSE extends eqLogic {
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GC');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
@@ -173,16 +191,16 @@ class OpenEVSE extends eqLogic {
 				$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
 				$options = array('slider'=>round($arr[2],0));
 				$cmdAmpSetPointSlider->execCmd($options, $cache=0);
-				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Rafraîchissement valeur set point à '.$setPointEVSE);
+				log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point -> Rafraîchissement valeur set point à '.$setPointEVSE);
 			} else {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Amperes Set Point : Check valeur set point EVSE vs Plugin OK');
+				log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point -> Check valeur set point EVSE vs Plugin OK');
 			}
 									
 			// Get OpenEVSE Temperature
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GP');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Temperature : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : Temperature -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
@@ -193,19 +211,47 @@ class OpenEVSE extends eqLogic {
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GG');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Volts-Amperes : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : Volts-Amperes -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
 			$arr = explode(" ", $data);
-			$this->checkAndUpdateCmd('EVSE_Amperes', round($arr[0]/1000,1));
-			$this->checkAndUpdateCmd('EVSE_Volts', round($arr[1]/1000,0));
+			$amperes = round($arr[0]/1000,1);
+			$volts = round($arr[1]/1000,0);
+			$this->checkAndUpdateCmd('EVSE_Amperes', $amperes);
+			$this->checkAndUpdateCmd('EVSE_Volts', $volts);
+			
+			// Adjust OpenEVSE Volts if Volts Reference Command value is different from charger
+			$sendVoltsCmd = $this->getConfiguration('sendVoltsCmd', '');
+			if (strlen($sendVoltsCmd)>0) {
+				if (is_numeric($sendVoltsCmd)) {
+					$cmdVolts = round($sendVoltsCmd,0);
+					if ($volts != $cmdVolts) {
+						$this->SetVoltageRef($cmdVolts);
+					}
+				} else {
+					$cmd = cmd::byId(str_replace('#', '', $sendVoltsCmd));
+					if (!is_object($cmd)) {
+						log::add('OpenEVSE', 'debug', "Fonction GetData : Commande '{$sendVoltsCmd}' non trouvée, vérifiez la configuration pour  {$this->getHumanName()}.");
+					}else{
+						$cmdVolts = $cmd->execCmd();
+						if (is_numeric($cmdVolts)) {
+							$cmdVolts = round($cmdVolts,0);
+							if ($volts != $cmdVolts) {
+								$this->SetVoltageRef($cmdVolts);
+							}
+						} else {
+							log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$sendVoltsCmd}' ne retourne pas une valeur numérique : ".$cmdVolts);
+						}
+					}
+				}	
+			}
 			
 			//Get OpenEVSE Plug State
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$G0');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Plug State : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : Plug State -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
@@ -222,7 +268,7 @@ class OpenEVSE extends eqLogic {
 			curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GU');
 			$data = curl_exec($ch);
 			if (curl_errno($ch)) {
-				log::add('OpenEVSE', 'debug','Fonction GetData - Charge Session : Erreur CURL '.curl_error($ch));
+				log::add('OpenEVSE', 'debug','Fonction GetData : Charge Session -> Erreur CURL '.curl_error($ch));
 				return;
 			}
 			$data = $this->get_string_between($data,'OK ','^');
@@ -286,23 +332,6 @@ class OpenEVSE extends eqLogic {
 		$info->setOrder(2);
 		$info->save();
 		
-		// $info = $this->getCmd(null, 'EVSE_AmpSetPoint');
-		// if (!is_object($info)) {
-			// $info = new OpenEVSECmd();
-			// $info->setName(__('Consigne : ', __FILE__));
-		// }
-		// $info->setLogicalId('EVSE_AmpSetPoint');
-		// $info->setEqLogic_id($this->getId());
-		// $info->setType('info');
-		// $info->setSubType('numeric');
-		// $info->setTemplate('dashboard','line');
-		// $info->setConfiguration('minValue', 0);
-		// $info->setConfiguration('maxValue', $this->getConfiguration("AMax"));
-		// $info->setIsHistorized(1);
-		// $info->setUnite('A');
-		// $info->setOrder(3);
-		// $info->save();
-		
 		$info = $this->getCmd(null, 'EVSE_ChargeSession');
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
@@ -315,7 +344,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('Kwh');
-		$info->setOrder(4);
+		$info->setOrder(3);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_Temp');
@@ -332,7 +361,7 @@ class OpenEVSE extends eqLogic {
 		$info->setConfiguration('maxValue', 80);
 		$info->setIsHistorized(1);
 		$info->setUnite('°C');
-		$info->setOrder(5);
+		$info->setOrder(4);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_Plug');
@@ -347,7 +376,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
-		$info->setOrder(6);
+		$info->setOrder(5);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
@@ -364,7 +393,7 @@ class OpenEVSE extends eqLogic {
 		$info->setConfiguration('maxValue', $this->getConfiguration("AMax"));
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
-		$info->setOrder(7);
+		$info->setOrder(6);
 		$info->save();
 		
 		$action = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
@@ -388,20 +417,8 @@ class OpenEVSE extends eqLogic {
 		$action->setEqLogic_id($this->getId());
 	    $action->setUnite('A');
 		$action->setDisplay("showNameOndashboard",0);
-		$action->setOrder(8);
+		$action->setOrder(7);
 		$action->save();
-		
-		// $action = $this->getCmd(null, 'EVSE_ApplySetPoint');
-		// if (!is_object($action)) {
-			// $action = new OpenEVSECmd();
-			// $action->setLogicalId('EVSE_ApplySetPoint');
-			// $action->setName(__('Modifier Consigne', __FILE__));
-		// }
-		// $action->setType('action');
-		// $action->setSubType('other');
-		// $action->setEqLogic_id($this->getId());
-		// $action->setOrder(9);
-		// $action->save();
 					
 		$info = $this->getCmd(null, 'EVSE_State');
 		if (!is_object($info)) {
@@ -415,7 +432,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
-		$info->setOrder(10);
+		$info->setOrder(8);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_Mode');
@@ -430,7 +447,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
-		$info->setOrder(11);
+		$info->setOrder(9);
 		$info->save();
 		$this->checkAndUpdateCmd('EVSE_Mode', 'Manuel');
 		
@@ -443,7 +460,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(12);
+		$action->setOrder(10);
 		$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_Stop');
@@ -455,7 +472,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(13);
+		$action->setOrder(11);
 		$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_ModeMan');
@@ -467,7 +484,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(14);
+		$action->setOrder(12);
 		$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_ModeAuto');
@@ -479,7 +496,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(15);
+		$action->setOrder(13);
 		$action->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoString');
@@ -494,7 +511,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(0);
-		$info->setOrder(16);
+		$info->setOrder(14);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoNumeric');
@@ -509,7 +526,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
-		$info->setOrder(17);
+		$info->setOrder(15);
 		$info->save();
 
 		$refresh = $this->getCmd(null, 'refresh');
