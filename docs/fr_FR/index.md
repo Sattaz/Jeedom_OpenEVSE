@@ -32,7 +32,7 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 
 -   Intensité de charge maximum (A) : veuillez sélectionner l'ampérage maximum que le chargeur ne doit pas dépasser, ceci en fonction de votre installation/abonnement électrique (en ampères)
 
--   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique ou renseigner une commande de typer information, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
+-   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique ou renseigner une commande de type information, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
 
 -> Veuillez dès à présent appuyer sur le bouton 'Sauvegarder' afin d'enregistrer la configuration.
 
