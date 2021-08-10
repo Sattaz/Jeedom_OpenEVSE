@@ -1,6 +1,6 @@
 * 10-Août-2021:
 
-Mise en place d'une liste de selection pour le choix de lintensité maximum du chargeur.
+Mise en place d'une liste de selection pour le choix de l'intensité maximum du chargeur.
 
 Ajout de l'ajustment de la tension de référence du chargeur depuis une commande info dans Jeedom ou en spécifiant une valeur numérique.
 				
