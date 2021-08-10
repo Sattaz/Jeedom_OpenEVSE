@@ -2,7 +2,7 @@
 
 Mise en place d'une liste de selection pour le choix de l'intensité maximum du chargeur.
 
-Ajout de l'ajustment de la tension de référence du chargeur depuis une commande info dans Jeedom ou en spécifiant une valeur numérique.
+Ajout de l'ajustement de la tension de référence du chargeur depuis une commande info dans Jeedom ou en spécifiant une valeur numérique.
 				
 * 07-Août-2021:
 
