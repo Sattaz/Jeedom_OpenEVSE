@@ -1,3 +1,8 @@
+* 07-Décembre-2021:
+
+Gestion de la valeur minimum de consigne de l'intensité.
+Correction d'un bug d'affichage.
+
 * 10-Août-2021:
 
 Mise en place d'une liste de selection pour le choix de l'intensité maximum du chargeur.
