@@ -295,8 +295,8 @@ class OpenEVSE extends eqLogic {
     }
 
     public function preSave() {
-		$this->setDisplay("width","200px");
-		$this->setDisplay("height","200px");
+		//$this->setDisplay("width","200px");
+		//$this->setDisplay("height","200px");
     }
 
     public function postSave() {
@@ -325,7 +325,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
-		$info->setConfiguration('minValue', 0);
+		$info->setConfiguration('minValue', $this->getConfiguration("AMin"));
 		$info->setConfiguration('maxValue', $this->getConfiguration("AMax"));
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
@@ -389,7 +389,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
-		$info->setConfiguration('minValue', 0);
+		$info->setConfiguration('minValue', $this->getConfiguration("AMin"));
 		$info->setConfiguration('maxValue', $this->getConfiguration("AMax"));
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
@@ -397,11 +397,12 @@ class OpenEVSE extends eqLogic {
 		$info->save();
 		
 		$action = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-		$AMin = 0;
+		$AMin = $this->getConfiguration("AMin");
 		$AMax = $this->getConfiguration("AMax");
 		if (empty($AMax)) {
-			$AMax = 0;
-		} else {
+			$AMax = 6;
+        }
+		if (empty($AMin)) {
 			$AMin = 6;
 		}
 		if (!is_object($action)) {
@@ -527,6 +528,21 @@ class OpenEVSE extends eqLogic {
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
 		$info->setOrder(15);
+		$info->save();
+      
+      	$info = $this->getCmd(null, 'EVSE_PersoBinary');
+		if (!is_object($info)) {
+			$info = new OpenEVSECmd();
+			$info->setName(__('Perso. Bin.', __FILE__));
+		}
+		$info->setLogicalId('EVSE_PersoBinary');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('binary');
+		$info->setTemplate('dashboard','line');
+		$info->setIsHistorized(1);
+		$info->setIsVisible(0);
+		$info->setOrder(16);
 		$info->save();
 
 		$refresh = $this->getCmd(null, 'refresh');
