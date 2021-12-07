@@ -126,6 +126,19 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</div>
 							</div>
 							<div class="form-group">
+							<label class="col-sm-3 control-label">{{Intensité de charge minimum (A)}}</label>
+							<div class="col-sm-3">
+								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMin" placeholder="Ampérage minimum de la borne (en A)"/> -->
+								<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMin">
+									<option value="6">6 Ampères</option>
+									<option value="7">7 Ampères</option>
+									<option value="8">8 Ampères</option>
+									<option value="9">9 Ampères</option>
+									<option value="10">10 Ampères</option>
+								</select>
+							</div>
+							</div>
+							<div class="form-group">
 							<label class="col-sm-3 control-label">{{Intensité de charge maximum (A)}}</label>
 							<div class="col-sm-3">
 								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMax" placeholder="Ampérage maximum que la borne ne doit pas dépasser (en A)"/> -->
