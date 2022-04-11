@@ -1,3 +1,7 @@
+* 11-Avril-2022:
+
+Ajout d'une commande pour mettre la charge en pause.
+
 * 07-Décembre-2021:
 
 Gestion de la valeur minimum de consigne de l'intensité.
