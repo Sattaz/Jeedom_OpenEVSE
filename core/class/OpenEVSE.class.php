@@ -71,6 +71,9 @@ class OpenEVSE extends eqLogic {
 				case ('Stop'):
 					curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$FD');
 					break;
+				case ('Pause'):
+					curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$FS');
+					break;                
 			}
 			curl_exec($ch);
 			if (curl_errno($ch)) {
@@ -475,6 +478,18 @@ class OpenEVSE extends eqLogic {
 		$action->setEqLogic_id($this->getId());
 		$action->setOrder(11);
 		$action->save();
+      
+      	$action = $this->getCmd(null, 'EVSE_Pause');
+		if (!is_object($action)) {
+			$action = new OpenEVSECmd();
+			$action->setLogicalId('EVSE_Pause');
+			$action->setName(__('PAUSE', __FILE__));
+		}
+		$action->setType('action');
+		$action->setSubType('other');
+		$action->setEqLogic_id($this->getId());
+		$action->setOrder(12);
+		$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_ModeMan');
 		if (!is_object($action)) {
@@ -485,7 +500,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(12);
+		$action->setOrder(13);
 		$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_ModeAuto');
@@ -497,7 +512,7 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('other');
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(13);
+		$action->setOrder(14);
 		$action->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoString');
@@ -512,7 +527,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(0);
-		$info->setOrder(14);
+		$info->setOrder(15);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoNumeric');
@@ -527,7 +542,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
-		$info->setOrder(15);
+		$info->setOrder(16);
 		$info->save();
       
       	$info = $this->getCmd(null, 'EVSE_PersoBinary');
@@ -542,7 +557,7 @@ class OpenEVSE extends eqLogic {
 		$info->setTemplate('dashboard','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
-		$info->setOrder(16);
+		$info->setOrder(17);
 		$info->save();
 
 		$refresh = $this->getCmd(null, 'refresh');
@@ -628,6 +643,10 @@ class OpenEVSECmd extends cmd {
 					break;
 				case 'EVSE_Stop':
 					$cmd = $eqlogic->SetStartStop('Stop');
+					$info = $eqlogic->GetData();
+					break;
+				case 'EVSE_Pause':
+					$cmd = $eqlogic->SetStartStop('Pause');
 					$info = $eqlogic->GetData();
 					break;
 				case 'EVSE_ModeMan':
