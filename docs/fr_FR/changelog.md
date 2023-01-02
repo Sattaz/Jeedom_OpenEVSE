@@ -1,3 +1,9 @@
+* 02-Janvier-2023:
+
+Intégration de la nouvelle WIFI API. (RAPI peut encore être utilisé)
+
+Possibilité d'usiliser une variable pour la commande ajustement tension depuis la configuration.
+
 * 11-Avril-2022:
 
 Ajout d'une commande pour mettre la charge en pause.
