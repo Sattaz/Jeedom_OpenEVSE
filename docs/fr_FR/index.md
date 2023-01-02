@@ -31,8 +31,8 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 -   IP de la borne : veuillez renseigner l'adresse IP de l'interface web du chargeur OpenEVSE/EmonEVSE.
 
 -   Mode de fonctionnement : veuillez sélectionner le type d'API à utiliser:
-   * RAPI (Obsolete) -> il est préconiser de ne plus utiliser ce mode, les anciens et nouveaux firmware wifi de la borne gèrent encore RAPI pour le moment.
-   * WIFI -> c'est la nouvelle méthode d'interraction avec la borne, intégré dans les derniers firmware wifi de la borne. Important: votre borne OpenEVSE doit être à jour avec une version de firmware wifi minimum 4.1.6 (https://github.com/OpenEVSE/ESP32_WiFi_V4.x/releases)
+    RAPI (Obsolete) -> il est préconiser de ne plus utiliser ce mode, les anciens et nouveaux firmware wifi de la borne gèrent encore RAPI pour le moment.
+    WIFI -> c'est la nouvelle méthode d'interraction avec la borne, intégré dans les derniers firmware wifi de la borne. Important: votre borne OpenEVSE doit être à jour avec une version de firmware wifi minimum 4.1.6 (https://github.com/OpenEVSE/ESP32_WiFi_V4.x/releases)
 
 -   Intensité de charge minimum (A) : veuillez sélectionner l'ampérage minimum que le chargeur doit délivrer (en ampères)
 
