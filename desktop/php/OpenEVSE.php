@@ -126,6 +126,16 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</div>
 							</div>
 							<div class="form-group">
+							<label class="col-sm-3 control-label">{{Mode de fonctionnement}}</label>
+							<div class="col-sm-3">
+								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Mode" placeholder="Mode de fonctionnement)"/> -->
+								<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Mode">
+									<option value="0">RAPI (Obsolete)</option>
+                                    <option value="1">WIFI API</option>
+								</select>
+							</div>
+							</div>
+							<div class="form-group">
 							<label class="col-sm-3 control-label">{{Intensité de charge minimum (A)}}</label>
 							<div class="col-sm-3">
 								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMin" placeholder="Ampérage minimum de la borne (en A)"/> -->
