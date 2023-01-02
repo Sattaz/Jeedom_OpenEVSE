@@ -30,9 +30,15 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 
 -   IP de la borne : veuillez renseigner l'adresse IP de l'interface web du chargeur OpenEVSE/EmonEVSE.
 
+-   Mode de fonctionnement : veuillez sélectionner le type d'API à utiliser:
+    - RAPI (Obsolete) -> il est préconisé de ne plus utiliser ce mode, les anciens et nouveaux firmwares wifi de la borne gèrent encore RAPI pour le moment.
+    - WIFI -> c'est la nouvelle méthode d'interraction avec la borne, intégré dans les derniers firmwares wifi de la borne. Important: votre borne OpenEVSE doit être à jour avec une version de firmware wifi minimum 4.1.6 (https://github.com/OpenEVSE/ESP32_WiFi_V4.x/releases)
+
+-   Intensité de charge minimum (A) : veuillez sélectionner l'ampérage minimum que le chargeur doit délivrer (en ampères)
+
 -   Intensité de charge maximum (A) : veuillez sélectionner l'ampérage maximum que le chargeur ne doit pas dépasser, ceci en fonction de votre installation/abonnement électrique (en ampères)
 
--   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique ou renseigner une commande de type information, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
+-   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique, renseigner une commande de type information ou encore une variable, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
 
 -> Veuillez dès à présent appuyer sur le bouton 'Sauvegarder' afin d'enregistrer la configuration.
 
@@ -47,7 +53,7 @@ Comme énoncé dans le précédent chapitre, les commandes de l'équipement sont
 
 Informations pratiques:
 
--> Les commandes 'Perso. Texte' et 'Perso. Num.' peuvent etre utilisée comme bon vous semble afin, par exemple, d'afficher des informations que vous obtiendrez depuis un scénario et les afficher sur la tuile du plugin.
+-> Les commandes 'Perso. Texte', 'Perso. Num.' et 'Perso. Bin.' peuvent etre utilisée comme bon vous semble afin, par exemple, d'afficher des informations que vous obtiendrez depuis un scénario et les afficher sur la tuile du plugin.
 
 Le widget 
 ===
