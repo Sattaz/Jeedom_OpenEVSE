@@ -46,10 +46,10 @@ class OpenEVSE extends eqLogic {
 			$OpenEVSE_IP = $this->getConfiguration("IP");
 			$ch = curl_init();
             
-          	//API Mode 0 is the new WIFI API
-          	//API Mode 1 is the obsolete RAPI
+          	//API Mode 1 is the new WIFI API
+          	//API Mode 0 is the obsolete RAPI
           
-			if ($Mode == 0) {
+			if ($Mode == 1) {
             	curl_setopt_array($ch, [
   					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/config',
   					CURLOPT_RETURNTRANSFER => true,
@@ -100,7 +100,7 @@ class OpenEVSE extends eqLogic {
 			$OpenEVSE_IP = $this->getConfiguration("IP");
 			$ch = curl_init();
           
-          	if ($Mode == 0) {
+          	if ($Mode == 1) {
               	$setopt = '{state:disabled}';
               	switch ($StartStop) {
 					case ('Start'):
@@ -108,33 +108,9 @@ class OpenEVSE extends eqLogic {
 						break;
 					case ('Stop'):
 						$setopt = '{state:"disabled"}';
-                    	//curl_setopt_array($ch, [
-  						//	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/config',
-  						//	CURLOPT_RETURNTRANSFER => true,
-  						//	CURLOPT_ENCODING => "",
-  						//	CURLOPT_MAXREDIRS => 10,
-  						//	CURLOPT_TIMEOUT => 10,
-  						//	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  						//	CURLOPT_CUSTOMREQUEST => 'POST',
-                  		//	CURLOPT_POSTFIELDS => '{pause_uses_disabled:true}',
-  						//	CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                		//]);
-                    	//$response = curl_exec($ch);
 						break;
 					case ('Pause'):
 						$setopt = '{state:"disabled"}';
-                   		//curl_setopt_array($ch, [
-  						//	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/config',
-  						//	CURLOPT_RETURNTRANSFER => true,
-  						//	CURLOPT_ENCODING => "",
-  						//	CURLOPT_MAXREDIRS => 10,
-  						//	CURLOPT_TIMEOUT => 10,
-  						//	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  						//	CURLOPT_CUSTOMREQUEST => 'POST',
-                  		//	CURLOPT_POSTFIELDS => '{pause_uses_disabled:true}',
-  						//	CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                		//]);
-                    	//$response = curl_exec($ch);
 						break;                
 				}
             	curl_setopt_array($ch, [
@@ -222,10 +198,10 @@ class OpenEVSE extends eqLogic {
 				$OpenEVSE_IP = $this->getConfiguration("IP");
 				$ch = curl_init();
               
-          		//API Mode 0 is the new WIFI API
-          		//API Mode 1 is the obsolete RAPI
+          		//API Mode 1 is the new WIFI API
+          		//API Mode 0 is the obsolete RAPI
           
-				if ($Mode == 0) {
+				if ($Mode == 1) {
                 	curl_setopt_array($ch, [
   						CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/status',
   						CURLOPT_RETURNTRANSFER => true,
@@ -328,22 +304,10 @@ class OpenEVSE extends eqLogic {
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
           
-     		//$action = $this->getCmd(null, 'EVSE_Pause');
-			//if (is_object($action)) {
-        	//	if ($Mode == 0) {
-            //  		try {
-			//			$action->remove();
-            //          	log::add('OpenEVSE', 'debug','Suppression commande PAUSE (WIFI API)');
-			//		} catch (Exception $e) {
-            //      		log::add('OpenEVSE', 'debug','Erreur suppression commande PAUSE (WIFI API) -> ' .$e->getMessage());
-			//		}
-            //	}
-        	//}
-          	
-         	//API Mode 0 is the new WIFI API
-          	//API Mode 1 is the obsolete RAPI
+        	//API Mode 1 is the new WIFI API
+          	//API Mode 0 is the obsolete RAPI
           
-			if ($Mode == 0) {              
+			if ($Mode == 1) {              
 	          	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
 				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/status');
@@ -542,7 +506,7 @@ class OpenEVSE extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
-
+    	$setMode = $this->setConfiguration("Mode",1); //Les nouveaux objets sont de type WIFI API par defaut.
     }
 
     public function postInsert() {
@@ -733,18 +697,13 @@ class OpenEVSE extends eqLogic {
       	$Mode = $this->getConfiguration("Mode");
      	$action = $this->getCmd(null, 'EVSE_Pause');
 		if (is_object($action)) {
-        	if ($Mode == 0) {
-              	try {
-					//$action->remove();
-                  	$this->getCmd(null, 'EVSE_Pause')->remove();
-                  	log::add('OpenEVSE', 'debug','Suppression commande PAUSE (WIFI API)');
-				} catch (Exception $e) {
-                  	log::add('OpenEVSE', 'debug','Erreur suppression commande PAUSE (WIFI API) -> ' .$e->getMessage());
-				}
-            }
+        	if ($Mode == 1) {
+				$action->remove();
+              	log::add('OpenEVSE', 'debug','Suppression commande PAUSE (WIFI API)');
+           	}
         } else {
-       		if ($Mode == 1) {	
-        		$action = new OpenEVSECmd();
+        	if ($Mode == 0) {
+  				$action = new OpenEVSECmd();
 				$action->setLogicalId('EVSE_Pause');
 				$action->setName(__('PAUSE', __FILE__));
           		$action->setType('action');
@@ -753,20 +712,8 @@ class OpenEVSE extends eqLogic {
 				$action->setOrder(11);
           		$action->save();
           		log::add('OpenEVSE', 'debug','Ajout commande PAUSE (RAPI)');
-          }
+            }
         }
-      
-   		//$action = $this->getCmd(null, 'EVSE_Pause');
-		//if (!is_object($action)) {
-		//	$action = new OpenEVSECmd();
-		//	$action->setLogicalId('EVSE_Pause');
-		//	$action->setName(__('PAUSE', __FILE__));
-		//}
-		//$action->setType('action');
-		//$action->setSubType('other');
-		//$action->setEqLogic_id($this->getId());
-		//$action->setOrder(12);
-      	//$action->save();
 		
 		$action = $this->getCmd(null, 'EVSE_ModeMan');
 		if (!is_object($action)) {
@@ -848,6 +795,8 @@ class OpenEVSE extends eqLogic {
 		$refresh->setSubType('other');
 		$refresh->setOrder(50);
 		$refresh->save();
+      
+      	
     }
 
     public function preUpdate() {
