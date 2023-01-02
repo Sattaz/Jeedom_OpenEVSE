@@ -48,8 +48,14 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
    tr += '</td>';
    tr += '<td style="min-width:75px;width:120px;">';
   // tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
-  tr += '<span class="type" type="' + init(_cmd.type) + '">'+_cmd.type+' | '+_cmd.subType+'</span>';
+  //tr += '<span class="type" type="' + init(_cmd.type) + '">'+_cmd.type+' | '+_cmd.subType+'</span>';
+   tr += '<span  >' + init(_cmd.type) + ' | ' + init(_cmd.subType) + '</span>';
 
+   tr += '<td style="display:none;">';
+   tr += '<span class="type" type="' + init(_cmd.type) + '" >' + jeedom.cmd.availableType() + '</span>';
+   tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+   tr += '</td>';
+   
   // tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
    tr += '</td>';
    tr += '<td style="min-width:50px;width:100px;">';
