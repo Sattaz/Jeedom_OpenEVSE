@@ -130,8 +130,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<div class="col-sm-3">
 								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Mode" placeholder="Mode de fonctionnement)"/> -->
 								<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Mode">
-									<option value="0">WIFI API</option>
-									<option value="1">RAPI (Obsolete)</option>
+									<option value="0">RAPI (Obsolete)</option>
+                                    <option value="1">WIFI API</option>
 								</select>
 							</div>
 							</div>
