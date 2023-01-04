@@ -6,7 +6,7 @@ Ajout de la valeur des commandes dans les paramètres du plugin.
 
 Intégration de la nouvelle WIFI API. (RAPI peut encore être utilisé)
 
-Possibilité d'usiliser une variable pour la commande ajustement tension depuis la configuration.
+Possibilité d'utiliser une variable pour la commande ajustement tension depuis la configuration.
 
 * 11-Avril-2022:
 
