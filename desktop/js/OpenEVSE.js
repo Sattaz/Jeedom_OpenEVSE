@@ -70,6 +70,11 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max.}}" title="{{Max.}}" style="width:30%;display:inline-block;"/> ';
    tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;display:inline-block;"/>';
    tr += '</td>';*/
+   
+   	tr += '<td>';
+		tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
+	tr += '</td>';
+   
    tr += '<td>';
    if (is_numeric(_cmd.id)) {
      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
