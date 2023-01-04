@@ -1,3 +1,7 @@
+* 04-Janvier-2023:
+
+Ajout de la valeur des commandes dans les paramètres du plugin.
+
 * 02-Janvier-2023:
 
 Intégration de la nouvelle WIFI API. (RAPI peut encore être utilisé)
