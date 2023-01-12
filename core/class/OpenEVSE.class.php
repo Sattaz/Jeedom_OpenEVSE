@@ -353,7 +353,7 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
 					//Refresh position of the slider
 					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-					$options = array('slider'=>round($arr[2],0));
+                  	$options = array('slider'=>$setPointEVSE);
 					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (WIFI API) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
@@ -430,7 +430,7 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
 					//Refresh position of the slider
 					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-					$options = array('slider'=>round($arr[2],0));
+					$options = array('slider'=>$setPointEVSE);
 					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (RAPI) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
