@@ -51,14 +51,14 @@ class OpenEVSE extends eqLogic {
           
 			if ($Mode == 1) {
             	curl_setopt_array($ch, [
-  					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/config',
+                  	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
   					CURLOPT_RETURNTRANSFER => true,
   					CURLOPT_ENCODING => "",
   					CURLOPT_MAXREDIRS => 10,
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   					CURLOPT_CUSTOMREQUEST => 'POST',
-                  	CURLOPT_POSTFIELDS => '{max_current_soft:'.$valueSlider.'}',
+                  	CURLOPT_POSTFIELDS => '{charge_current :'.$valueSlider.'}',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
 				$response = curl_exec($ch);
@@ -310,7 +310,9 @@ class OpenEVSE extends eqLogic {
 			if ($Mode == 1) {              
 	          	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/status');
+              
+              	//Get all other data
+           		curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/status');
               	$data = curl_exec($ch);
               	if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : State - Erreur CURL (WIFI API) -> '.curl_error($ch));
@@ -821,7 +823,6 @@ class OpenEVSE extends eqLogic {
     /*
      * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
       public function toHtml($_version = 'dashboard') {
-
       }
      */
 
