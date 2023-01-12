@@ -2,7 +2,7 @@
 
 Modification de certaines fonctions afin d'utiliser l'endpoint '/override' pour l'ajustement de l'intensité, le démarrage ou l'arrêt d'une charge. (Merci à KipK pour tous les conseils et bravo pour la nouvelle GUI V2 du chargeur OpenEVSE!)
 
-"ATTENTION : si vous migrez vers le firmware wifi GUI V2, merci de ne plus utiliser le mode RAPI depuis le plugin!!!"
+**ATTENTION : si vous migrez vers le firmware wifi GUI V2, merci de ne plus utiliser le mode RAPI depuis le plugin!!!**
 
 * 04-Janvier-2023:
 
