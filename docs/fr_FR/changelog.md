@@ -1,3 +1,11 @@
+* 14-Janvier-2023:
+
+Corrections de bugs concernant la nouvelle API WIFI:
+
+- La charge redémarrait lors du rafraichissement des commandes (bug de code lié au positionnement du curseur de consigne de charge).
+- Lors de l'arrêt d'une charge, la consigne de charge sur le chargeur se mettait au maximum.
+- Un message d'erreur apparaissait si l'équipement était mis sur 'Inactiver'.
+
 * 12-Janvier-2023:
 
 Modification de certaines fonctions afin d'utiliser l'endpoint '/override' pour l'ajustement de l'intensité, le démarrage ou l'arrêt d'une charge. (Merci à KipK pour tous les conseils et bravo pour la nouvelle GUI V2 du chargeur OpenEVSE!)
