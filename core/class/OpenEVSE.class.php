@@ -37,10 +37,10 @@ class OpenEVSE extends eqLogic {
 		}
     }
 	
-	public function SetSliderSetPoint($valueSlider) {
+	public function SetSliderSetPoint($valueSlider,$update) {
 		try {
-          
-          	if ($valueSlider==0) {return;}
+        
+          	if ($valueSlider==0 || $update==0) {return;}
           
           	$Mode = $this->getConfiguration("Mode");
 			$OpenEVSE_IP = $this->getConfiguration("IP");
@@ -89,6 +89,8 @@ class OpenEVSE extends eqLogic {
                   	return $valueSlider;
 				}
             }
+          	sleep(2);
+          	$this->GetData();
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint ' . ' ' . $e->getMessage()));
        	}
@@ -101,18 +103,21 @@ class OpenEVSE extends eqLogic {
 			$ch = curl_init();
           
           	if ($Mode == 1) {
-              	$setopt = '{state:disabled}';
+               	$cmd = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
+				$setPointCMD = $cmd->execCmd();
+              	$setopt = '{state:"disabled"';
               	switch ($StartStop) {
 					case ('Start'):
-						$setopt = '{state:"active"}';
+						$setopt = '{state:"active"';
 						break;
 					case ('Stop'):
-						$setopt = '{state:"disabled"}';
+						$setopt = '{state:"disabled"';
 						break;
 					case ('Pause'):
-						$setopt = '{state:"disabled"}';
+						$setopt = '{state:"disabled"';
 						break;                
 				}
+              	$setopt = $setopt.',charge_current:'.$setPointCMD.'}';
             	curl_setopt_array($ch, [
   					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
   					CURLOPT_RETURNTRANSFER => true,
@@ -154,6 +159,7 @@ class OpenEVSE extends eqLogic {
 					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (RAPI)');
 				}
             }
+          	sleep(2);
           	$this->GetData();
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
@@ -353,7 +359,7 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
 					//Refresh position of the slider
 					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-                  	$options = array('slider'=>$setPointEVSE);
+                  	$options = array('slider'=>$setPointEVSE,'update'=>'no');
 					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (WIFI API) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
@@ -430,7 +436,7 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
 					//Refresh position of the slider
 					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-					$options = array('slider'=>$setPointEVSE);
+                  	$options = array('slider'=>$setPointEVSE,'update'=>'no');
 					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (RAPI) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
@@ -797,8 +803,7 @@ class OpenEVSE extends eqLogic {
 		$refresh->setSubType('other');
 		$refresh->setOrder(50);
 		$refresh->save();
-      
-      	
+
     }
 
     public function preUpdate() {
@@ -806,10 +811,14 @@ class OpenEVSE extends eqLogic {
     }
 
     public function postUpdate() {
-		$cmd = $this->getCmd(null, 'refresh'); // On recherche la commande refresh de l’équipement
-		if (is_object($cmd)) { //elle existe et on lance la commande
-			 $cmd->execCmd();
-		}
+   		foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
+			if ($OpenEVSE->getIsEnable() == 1) {//vérifie que l'équipement est actif
+				$cmd = $this->getCmd(null, 'refresh'); // On recherche la commande refresh de l’équipement
+				if (is_object($cmd)) { //elle existe et on lance la commande
+					$cmd->execCmd();
+				}
+			}
+		}  
     }
 
     public function preRemove() {
@@ -859,34 +868,37 @@ class OpenEVSECmd extends cmd {
 
     public function execute($_options = array()) {
 		$eqlogic = $this->getEqLogic();
-			switch ($this->getLogicalId()) {		
-				case 'EVSE_AmpSetPointSlider':
-					$info = $eqlogic->SetSliderSetPoint($_options['slider']/1);
-					$eqlogic->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $info); 
-					break;
-				case 'EVSE_Start':
-					$cmd = $eqlogic->SetStartStop('Start');
-					$info = $eqlogic->GetData();					
-					break;
-				case 'EVSE_Stop':
-					$cmd = $eqlogic->SetStartStop('Stop');
-					$info = $eqlogic->GetData();
-					break;
-				case 'EVSE_Pause':
-					$cmd = $eqlogic->SetStartStop('Pause');
-					$info = $eqlogic->GetData();
-					break;
-				case 'EVSE_ModeMan':
-					$cmd = $eqlogic->SetMode('Man');
-					$info = $eqlogic->GetData();
-					break;
-				case 'EVSE_ModeAuto':
-					$cmd = $eqlogic->SetMode('Auto');
-					$info = $eqlogic->GetData();
-					break;
-				case 'refresh':
-					$info = $eqlogic->GetData();
-					break;					
+		switch ($this->getLogicalId()) {		
+			case 'EVSE_AmpSetPointSlider':
+        		$update = 1;
+               	if ($_options['update']=='no') {$update=0;}
+                $info = $eqlogic->SetSliderSetPoint($_options['slider']/1,$update);
+				$eqlogic->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $info);
+                $info = $eqlogic->GetData();
+				break;
+			case 'EVSE_Start':
+				$cmd = $eqlogic->SetStartStop('Start');
+                $info = $eqlogic->GetData();
+				break;
+			case 'EVSE_Stop':
+				$cmd = $eqlogic->SetStartStop('Stop');
+                $info = $eqlogic->GetData();
+				break;
+			case 'EVSE_Pause':
+				$cmd = $eqlogic->SetStartStop('Pause');
+                $info = $eqlogic->GetData();
+				break;
+			case 'EVSE_ModeMan':
+				$cmd = $eqlogic->SetMode('Man');
+				$info = $eqlogic->GetData();
+				break;
+			case 'EVSE_ModeAuto':
+				$cmd = $eqlogic->SetMode('Auto');
+				$info = $eqlogic->GetData();
+				break;
+			case 'refresh':
+				$info = $eqlogic->GetData();
+				break;					
 		}
     }
     /*     * **********************Getteur Setteur*************************** */
