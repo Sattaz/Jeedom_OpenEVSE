@@ -835,14 +835,10 @@ class OpenEVSE extends eqLogic {
     }
 
     public function postUpdate() {
-   		foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
-			if ($OpenEVSE->getIsEnable() == 1) {//vérifie que l'équipement est actif
-				$cmd = $this->getCmd(null, 'refresh'); // On recherche la commande refresh de l’équipement
-				if (is_object($cmd)) { //elle existe et on lance la commande
-					$cmd->execCmd();
-				}
-			}
-		}  
+	//$cmd = $this->getCmd(null, 'refresh'); // On recherche la commande refresh de l’équipement
+	//if (is_object($cmd)) { //elle existe et on lance la commande
+	//	$cmd->execCmd();
+	//}
     }
 
     public function preRemove() {
