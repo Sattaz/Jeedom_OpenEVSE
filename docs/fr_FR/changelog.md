@@ -2,9 +2,9 @@
 
 Corrections de bugs concernant la nouvelle API WIFI:
 
--- La charge redémarrait lors du rafraichissement des commandes (bug de code lié au positionnement du curseur de consigne de charge).
--- Lors de l'arrêt d'une charge, la consigne de charge sur le chargeur se mettait au maximum.
--- Un message d'erreur apparaissait si l'équipement était mis sur 'Inactiver'.
+*- La charge redémarrait lors du rafraichissement des commandes (bug de code lié au positionnement du curseur de consigne de charge).
+*- Lors de l'arrêt d'une charge, la consigne de charge sur le chargeur se mettait au maximum.
+*- Un message d'erreur apparaissait si l'équipement était mis sur 'Inactiver'.
 
 * 12-Janvier-2023:
 
