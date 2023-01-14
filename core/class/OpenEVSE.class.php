@@ -50,6 +50,30 @@ class OpenEVSE extends eqLogic {
           	//API Mode 0 is the obsolete RAPI
           
 			if ($Mode == 1) {
+              	//Get OpenEVSE State
+             	curl_setopt_array($ch, [
+                  	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  					CURLOPT_CUSTOMREQUEST => 'GET',
+  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                ]);
+				$response = curl_exec($ch);
+				$err = curl_error($ch);
+				if ($err) {
+                   	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
+				}
+
+              	$json = json_decode($response, true);
+  				$state = $json['state'];
+              	if ($state != 'disabled' && $state != 'active') {
+                	$state = 'disabled';
+                }
+              
+              	//Set State $ setpoint
             	curl_setopt_array($ch, [
                   	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
   					CURLOPT_RETURNTRANSFER => true,
@@ -58,7 +82,7 @@ class OpenEVSE extends eqLogic {
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   					CURLOPT_CUSTOMREQUEST => 'POST',
-                  	CURLOPT_POSTFIELDS => '{charge_current :'.$valueSlider.'}',
+                  	CURLOPT_POSTFIELDS => '{state :"'.$state.'" ,charge_current :'.$valueSlider.'}',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
 				$response = curl_exec($ch);
