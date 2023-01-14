@@ -1,6 +1,6 @@
 * 14-Janvier-2023:
 
-Corrections de bugs concernant la nouvelle API WIFI:
+Corrections de bugs concernant l'utilisation de la nouvelle API WIFI:
 
 -> La charge redémarrait lors du rafraichissement des commandes (bug de code lié au positionnement du curseur de consigne de charge).  
 -> Lors de l'arrêt d'une charge, la consigne de charge sur le chargeur se mettait au maximum.  
