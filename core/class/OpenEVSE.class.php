@@ -65,13 +65,13 @@ class OpenEVSE extends eqLogic {
 				$err = curl_error($ch);
 				if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
+                  	curl_close($ch);
+                  	return;
 				}
 
               	$json = json_decode($response, true);
-  				$state = $json['state'];
-              	if ($state != 'disabled' && $state != 'active') {
-                	$state = 'disabled';
-                }
+              	$json['charge_current'] = $valueSlider;
+				$json = json_encode($json);
               
               	//Set State $ setpoint
             	curl_setopt_array($ch, [
@@ -82,7 +82,7 @@ class OpenEVSE extends eqLogic {
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   					CURLOPT_CUSTOMREQUEST => 'POST',
-                  	CURLOPT_POSTFIELDS => '{state :"'.$state.'" ,charge_current :'.$valueSlider.'}',
+                  	CURLOPT_POSTFIELDS => $json,
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
 				$response = curl_exec($ch);
@@ -113,8 +113,6 @@ class OpenEVSE extends eqLogic {
                   	return $valueSlider;
 				}
             }
-          	sleep(2);
-          	$this->GetData();
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint ' . ' ' . $e->getMessage()));
        	}
@@ -129,20 +127,41 @@ class OpenEVSE extends eqLogic {
           	if ($Mode == 1) {
                	$cmd = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
 				$setPointCMD = $cmd->execCmd();
-              	$setopt = '{state:"disabled"';
+              	$state = 'disabled';
               	switch ($StartStop) {
 					case ('Start'):
-						$setopt = '{state:"active"';
+						$state = 'active';
 						break;
 					case ('Stop'):
-						$setopt = '{state:"disabled"';
+						$state = 'disabled';
 						break;
 					case ('Pause'):
-						$setopt = '{state:"disabled"';
+						$state = 'disabled';
 						break;                
 				}
-              	$setopt = $setopt.',charge_current:'.$setPointCMD.'}';
-            	curl_setopt_array($ch, [
+              
+             	curl_setopt_array($ch, [
+                  	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  					CURLOPT_CUSTOMREQUEST => 'GET',
+  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                ]);
+				$response = curl_exec($ch);
+				$err = curl_error($ch);
+				if ($err) {
+                   	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
+                  	curl_close($ch);
+                  	return;
+				}
+              	$json = json_decode($response, true);
+              	$json['state'] = $state;
+				$json = json_encode($json);
+              
+				curl_setopt_array($ch, [
   					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
   					CURLOPT_RETURNTRANSFER => true,
   					CURLOPT_ENCODING => "",
@@ -150,7 +169,7 @@ class OpenEVSE extends eqLogic {
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   					CURLOPT_CUSTOMREQUEST => 'POST',
-                  	CURLOPT_POSTFIELDS => $setopt,
+                  	CURLOPT_POSTFIELDS => $json,
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
 				$response = curl_exec($ch);
@@ -183,8 +202,6 @@ class OpenEVSE extends eqLogic {
 					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (RAPI)');
 				}
             }
-          	sleep(2);
-          	$this->GetData();
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
 		}
@@ -252,22 +269,15 @@ class OpenEVSE extends eqLogic {
                       	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (WIFI API) -> ' .$response);
 					}
                 } else {
-                  	curl_setopt_array($ch, [
-  						CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts,
-  						CURLOPT_RETURNTRANSFER => true,
-  						CURLOPT_ENCODING => "",
-  						CURLOPT_MAXREDIRS => 10,
-  						CURLOPT_TIMEOUT => 10,
-  						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  						CURLOPT_CUSTOMREQUEST => 'GET',
-                   	]);
-					$data = curl_exec($ch);
-                  	curl_close($ch);
+                  	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts;
+            		curl_setopt($ch, CURLOPT_URL, $setopt);
+					curl_exec($ch);
+              		curl_close($ch);
 					if (curl_errno($ch)) {
-						log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (RAPI) -> ').curl_error($ch);
+                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (RAPI) -> ').curl_error($ch);
 					} else {
-						log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (RAPI)');
-					}  
+                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (RAPI)');
+					}
                 }
 				
 			}
@@ -898,14 +908,17 @@ class OpenEVSECmd extends cmd {
 				break;
 			case 'EVSE_Start':
 				$cmd = $eqlogic->SetStartStop('Start');
+            	sleep(2);
                 $info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Stop':
 				$cmd = $eqlogic->SetStartStop('Stop');
+            	sleep(2);
                 $info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Pause':
 				$cmd = $eqlogic->SetStartStop('Pause');
+            	sleep(2);
                 $info = $eqlogic->GetData();
 				break;
 			case 'EVSE_ModeMan':
