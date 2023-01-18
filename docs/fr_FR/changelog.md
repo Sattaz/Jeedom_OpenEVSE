@@ -1,3 +1,7 @@
+* 18-Janvier-2023:
+
+Corrections de bugs mineurs concernant l'utilisation de la nouvelle API WIFI.
+
 * 14-Janvier-2023:
 
 Corrections de bugs concernant l'utilisation de la nouvelle API WIFI:
