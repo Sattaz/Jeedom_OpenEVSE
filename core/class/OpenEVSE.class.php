@@ -221,7 +221,17 @@ class OpenEVSE extends eqLogic {
 						$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FS';
 						break;                
 				}
-              	curl_setopt($ch, CURLOPT_URL, $setopt);
+              
+              	curl_setopt_array($ch, [
+  					CURLOPT_URL => $setopt,
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  					CURLOPT_CUSTOMREQUEST => 'GET',
+                ]);
+              
 				$response = curl_exec($ch);
               
               	if ($response=='') {
@@ -317,8 +327,18 @@ class OpenEVSE extends eqLogic {
 					}
                 } else {
                   	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts;
-            		curl_setopt($ch, CURLOPT_URL, $setopt);
-					$response = curl_exec($ch);
+                  
+                  	curl_setopt_array($ch, [
+  						CURLOPT_URL => $setopt,
+  						CURLOPT_RETURNTRANSFER => true,
+  						CURLOPT_ENCODING => "",
+  						CURLOPT_MAXREDIRS => 10,
+  						CURLOPT_TIMEOUT => 10,
+  						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  						CURLOPT_CUSTOMREQUEST => 'GET',
+                	]);
+
+                  	$response = curl_exec($ch);
                   
                   	if ($response=='') {
                   		curl_close($ch);
