@@ -125,6 +125,18 @@ $eqLogics = eqLogic::byType($plugin->getId());
 									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="IP" placeholder="IP de la borne"/>
 								</div>
 							</div>
+                           	<div class="form-group">
+								<label class="col-sm-3 control-label">{{Identifiant}}</label>
+								<div class="col-sm-3">
+									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="User" placeholder="Identifiant"/>
+								</div>
+							</div>
+                           	<div class="form-group">
+        						<label class="col-sm-3 control-label">{{Mot de passe}}</label>
+        						<div class="col-sm-3">
+									<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="Password" placeholder="Mot de passe"/>
+        						</div>
+    						</div>
 							<div class="form-group">
 							<label class="col-sm-3 control-label">{{Mode de fonctionnement}}</label>
 							<div class="col-sm-3">
