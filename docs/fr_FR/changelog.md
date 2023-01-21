@@ -1,3 +1,8 @@
+* 21-Janvier-2023:
+
+Ajout de l'authentification HTTP.
+Corrections de bugs.
+
 * 18-Janvier-2023:
 
 Corrections de bugs mineurs concernant l'utilisation de la nouvelle API WIFI.
