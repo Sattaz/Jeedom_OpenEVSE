@@ -46,6 +46,10 @@ Puis viennent aussi quelques paramètres dédiés aux spécifications du chargeu
 
 -   Commande ajustement tension (V) : Vous pouvez spécifier une valeur numérique, renseigner une commande de type information ou encore une variable, cette donnée va servir à ajuster la valeur de la tension de référence du chargeur afin d'optimiser le calcul de la session de charge au plus précis.
 
+- Commande lecture mode tarification : Vous pouvez renseigner une commande de type information qui indiquera au chargeur le passage aux heures creuses. En mode automatique, le plugin activera la charge lors du passage en heures creuses et désactivera la charge lors du basculement en heures pleines.
+
+- Mode tarification chargement auto. : En complément de la commande lecture mode tarification, vous devrez spécifier a quoi correspond le mode de tarification, par exemple 'HC' ou encore 'HC...'.
+
 -> Veuillez dès à présent appuyer sur le bouton 'Sauvegarder' afin d'enregistrer la configuration.
 
 -> Cette action va automatiquement créer les commandes de l'équipement.
@@ -72,10 +76,9 @@ Libre à vous de modifier le widget afin de l'adapter à votre style de présent
 
 Informations pratiques:
 
--> Les boutons 'ON' et 'OFF' permettent de démarrer ou arrêter une charge.
+-> Le bouton 'ON' / 'OFF' permet de démarrer ou arrêter une charge.
 
--> Les boutons 'Man.' et 'Auto.' n'ont aucun effet direct avec le chargeur, ils permettent simplement de changer l'information 'Mode' du plugin en 'Manuel' ou 'Automatique'.
-   Vous pouvez donc utiliser un scenario depuis Jeedom afin d'interragir de facon différente en fonction du 'Mode' du plugin:
+-> Le bouton 'Man.' / 'Auto.' positionné en mode 'auto.' activera automatiquement la charge en heures creuses lorsque les paramètres sont indiqués dans la configuration de l'équipement. Il permet aussi de changer l'information 'Mode' du plugin en 'Manuel' ou 'Automatique', vous pouvez donc utiliser un scenario depuis Jeedom afin d'interragir de facon différente en fonction du 'Mode' du plugin:
 
 * En 'Manuel', le scénario pourra par exemple ignorer tout automatisme et donc laisser l'utilisateur démarrer ou arrêter une charge avec les boutons 'ON' et 'OFF' manuellement.
 
