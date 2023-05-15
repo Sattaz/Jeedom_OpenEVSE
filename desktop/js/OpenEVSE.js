@@ -61,10 +61,10 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
    tr += '<td style="min-width:50px;width:100px;">';
    tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></div> ';
    tr += '</td>';
-   //tr += '<td style="min-width:50px;width:170px;">';
-   //tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></div> ';
+   tr += '<td style="min-width:50px;width:170px;">';
+   tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></div> ';
    //tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></div>';
-   //tr += '</td>';
+   tr += '</td>';
    /*tr += '<td style="min-width:180px;">';
    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min.}}" title="{{Min.}}" style="width:30%;display:inline-block;"/> ';
    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max.}}" title="{{Max.}}" style="width:30%;display:inline-block;"/> ';
@@ -100,10 +100,18 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
 
  }
 
-$(".listCmdInfoNumeric").on('click', function () {
+$(".listCmdInfoVoltsCmd").on('click', function () {
     var el = $(this);
     jeedom.cmd.getSelectModal({ cmd: { type: 'info', subType: 'numeric' } }, function (result) {
         var calcul = el.closest('div').find('.eqLogicAttr[data-l1key=configuration][data-l2key=sendVoltsCmd]');
+        calcul.atCaret('insert', result.human);
+    });  
+});
+
+$(".listCmdInfoHPHCCmd").on('click', function () {
+    var el = $(this);
+    jeedom.cmd.getSelectModal({ cmd: { type: 'info', subType: 'string' } }, function (result) {
+        var calcul = el.closest('div').find('.eqLogicAttr[data-l1key=configuration][data-l2key=sendHPHCCmd]');
         calcul.atCaret('insert', result.human);
     });
 });
