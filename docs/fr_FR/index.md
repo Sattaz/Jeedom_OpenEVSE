@@ -59,6 +59,10 @@ Commandes de l'équipement
 
 Comme énoncé dans le précédent chapitre, les commandes de l'équipement sont automatiquement crées dès lors que la configuration est sauvegardée.
 
+IMPORTANT : Afin de pouvoir utiliser les boutons graphique des commandes de type ACTION pour démarrer/arrêter la charge ou encore changer le mode manuel/automatique, il faut impérativement nommer ces commandes avec '_ON' ou '_OFF' à la fin de chaque commande.
+
+Example: Charge_ON / Charge_OFF ou encore ModeAuto_ON / ModeAuto_OFF
+
 ![OpenEVSE](https://sattaz.github.io/Jeedom_OpenEVSE/pictures/OpenEVSE_2.jpg)
 
 Informations pratiques:
