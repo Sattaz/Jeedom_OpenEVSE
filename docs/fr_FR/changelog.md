@@ -1,3 +1,8 @@
+* 15-Mai-2023:
+
+Ajout de l'option d'historisation dans la configuration de l'équipement.
+Corrections de bugs.
+
 * 21-Janvier-2023:
 
 Ajout de l'authentification HTTP.
