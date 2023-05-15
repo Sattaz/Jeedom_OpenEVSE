@@ -523,7 +523,7 @@ class OpenEVSE extends eqLogic {
   					CURLOPT_MAXREDIRS => 10,
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                  	CURLOPT_IGNORE_CONTENT_LENGTH => 136,
+                  			CURLOPT_IGNORE_CONTENT_LENGTH => 136,
   					CURLOPT_CUSTOMREQUEST => 'GET',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
@@ -564,7 +564,7 @@ class OpenEVSE extends eqLogic {
 						break;
                   	case ($state == 254):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($state == 255 || $state == 0):
 						$this->checkAndUpdateCmd('EVSE_State', 'OFF');
@@ -637,7 +637,7 @@ class OpenEVSE extends eqLogic {
 						break;
 					case ($arr[0] == '02' || $arr[0] == 'fe'): // || $arr[0] == 'ff'):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] == '01'):
 						$this->checkAndUpdateCmd('EVSE_State', 'ON');
