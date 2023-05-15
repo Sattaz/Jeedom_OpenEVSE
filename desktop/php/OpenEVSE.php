@@ -165,7 +165,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<div class="col-sm-3">
 								<!-- <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMax" placeholder="Ampérage maximum que la borne ne doit pas dépasser (en A)"/> -->
 								<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="AMax">
-									<option value="6">6 Ampères</option>
 									<option value="7">7 Ampères</option>
 									<option value="8">8 Ampères</option>
 									<option value="9">9 Ampères</option>
@@ -201,10 +200,27 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								<div class="input-group CA-cmd-el">
 									<input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="sendVoltsCmd" placeholder="Commande qui indique la tension secteur au chargeur (en Volts)"/>
 									<span class="input-group-btn">
-									<button type="button" class="btn btn-default cursor listCmdInfoNumeric tooltips" title="{{Rechercher une commande}}" data-input="sendCmd"><i class="fas fa-list-alt"></i></button>
+									<button type="button" class="btn btn-default cursor listCmdInfoVoltsCmd tooltips" title="{{Rechercher une commande}}" data-input="sendCmd"><i class="fas fa-list-alt"></i></button>
 									</span>
 								</div>			
 							</div>
+							</div>
+                     		<div class="form-group">
+							<label class="col-sm-3 control-label">{{Commande lecture mode tarification}}</label>
+							<div class="col-sm-6">
+								<div class="input-group CA-cmd-el">
+									<input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="sendHPHCCmd" placeholder="Commande qui indique le mode de tarification en cours"/>
+									<span class="input-group-btn">
+									<button type="button" class="btn btn-default cursor listCmdInfoHPHCCmd tooltips" title="{{Rechercher une commande}}" data-input="sendCmd"><i class="fas fa-list-alt"></i></button>
+									</span>
+								</div>			
+							</div>
+							</div>
+                          	<div class="form-group">
+								<label class="col-sm-3 control-label">{{Mode tarification chargement auto.}}</label>
+								<div class="col-sm-3">
+									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="indexHCCmd" placeholder="'HC' ou 'HC'... ou '1' , etc..."/>
+								</div>
 							</div>
 							
 						</div>
@@ -234,7 +250,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								<th>{{Id}}</th>
 								<th>{{Nom}}</th>
 								<th>{{Type}}</th>
-								<th>{{Options}}</th>
+								<th>{{Affichage}}</th>
+                                				<th>{{Historique}}</th>
 								<th>{{Valeurs}}</th>
 								<!-- <th>{{Paramètres}}</th> -->
 								<th>{{Action}}</th>
