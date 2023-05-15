@@ -36,11 +36,33 @@ class OpenEVSE extends eqLogic {
 			}
 		}
     }
+  
+  	public static function templateWidget(){
+		$return = array('info' => array('string' => array()));
+     	$return['action']['other']['OnOff'] = array(
+			'template' => 'tmplicon',
+			'replace' => array(
+				'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/on.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Désactiver la charge">',
+				'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/off.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Activer la charge">'
+			)
+		);
+      	$return['action']['other']['AutoManu'] = array(
+			'template' => 'tmplicon',
+			'replace' => array(
+				'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/auto.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Auto">',
+				'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/manu.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Manuel">'
+			)
+		);
+      	$return['action']['slider']['setpoint'] = array(
+            'template' => 'nooSliderOpenEVSE' //'SliderButton' //'nooSliderOpenEVSE'
+        );
+		return $return;
+	}
 	
-	public function SetSliderSetPoint($valueSlider,$update) {
+	public function SetSliderSetPoint($valueSlider) {
 		try {
         
-          	if ($valueSlider==0 || $update==0) {return;}
+          	if ($valueSlider==0) {return;}
           
           	$Mode = $this->getConfiguration("Mode");
 			$OpenEVSE_IP = $this->getConfiguration("IP");
@@ -202,6 +224,15 @@ class OpenEVSE extends eqLogic {
                 ]);
 				$response = curl_exec($ch);
 				$err = curl_error($ch);
+              
+              	//EVSE needs to get amp setpoint once again, 2 seconds after the start of charge :-(
+              	//if ($state=='active') {
+                //	sleep(2);
+              	//	$response = curl_exec($ch);
+                //}
+              
+              	$err = curl_error($ch);
+                     
               	curl_close($ch);
              	if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL (WIFI API) -> ').$err;
@@ -257,9 +288,11 @@ class OpenEVSE extends eqLogic {
 			switch ($SelMode) {
 				case 'Man':
 					$this->checkAndUpdateCmd('EVSE_Mode', 'Manuel');
+                	$this->checkAndUpdateCmd('EVSE_ModeBin', 0);
 					break;
 				case 'Auto':
 					$this->checkAndUpdateCmd('EVSE_Mode', 'Automatique');
+                	$this->checkAndUpdateCmd('EVSE_ModeBin', 1);
 					break;
 			}
 			log::add('OpenEVSE', 'debug','Fonction SetMode : Changement valeur à '.$SelMode);
@@ -391,27 +424,84 @@ class OpenEVSE extends eqLogic {
                		if (!is_object($cmd)) {
 						log::add('OpenEVSE', 'debug', "Fonction GetData : Commande '{$sendVoltsCmd}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
 					}else{
+                      	$cmdName=$cmd->getName();
 						$cmdVolts = $cmd->execCmd();
 						if (is_numeric($cmdVolts)) {
 							$cmdVolts = round($cmdVolts,0);
 							if ($volts != $cmdVolts) {
-                               	log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$sendVoltsCmd}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
+                               	log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$cmdName}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
 								$this->SetVoltageRef($cmdVolts);
 							}
 						} else {
-							log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$sendVoltsCmd}' ne retourne pas une valeur numérique ($APIType) -> ".$cmdVolts);
+							log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$cmdName}' ne retourne pas une valeur numérique ($APIType) -> ".$cmdVolts);
 						}
 					}
             	}
         	}	
 		}  
     }
+  
+	public function CheckHPHC($APIType) {
+    	$sendHPHCCmd = $this->getConfiguration('sendHPHCCmd', '');
+		if (strlen($sendHPHCCmd)>0) {
+        	$cmdHPHC = cmd::byId(str_replace('#', '', $sendHPHCCmd));
+          	if (!is_object($cmdHPHC)) {
+				log::add('OpenEVSE', 'debug', "Fonction CheckHC : Commande '{$cmdHPHC->getName()}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
+			}else{
+				$valCmdHPHC = $cmdHPHC->execCmd();
+              	$valCmdHPHC = strtoupper($valCmdHPHC);
+              	$valCmdIndexHC = $this->getConfiguration('indexHCCmd', '');
+              	$valCmdIndexHC = strtoupper($valCmdIndexHC);
+              	$cmd = $this->getCmd(null, 'EVSE_IndexHC');
+      			$valIndexHC = $cmd->execCmd();
+              	$valIndexHC = strtoupper($valIndexHC);
+              	$cmd = $this->getCmd(null, 'EVSE_ModeBin');
+      			$valModeBin = $cmd->execCmd();
+              	if ($valCmdHPHC!=$valIndexHC) {
+                  	$cmdName=$cmdHPHC->getName();
+               		$this->checkAndUpdateCmd('EVSE_IndexHC', $valCmdHPHC);
+                  	log::add('OpenEVSE', 'debug',"Fonction CheckHC : La commande '{$cmdName}' retourne une nouvelle valeur ($APIType) -> ".$valCmdHPHC);
+                  	if ($valModeBin==1) { 
+                  		if ($valCmdHPHC==$valCmdIndexHC) {
+                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge"); 
+                   			$this->SetStartStop('Start');
+                    	} else {
+                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
+                  			$this->SetStartStop('Stop');
+                    	}
+                  		sleep(2);
+                    }
+                } else {
+                	if($valModeBin==1) {
+                    	$cmd = $this->getCmd(null, 'EVSE_Status');
+      					$valEVSEStatus = $cmd->execCmd();
+                      	if ($valCmdHPHC==$valCmdIndexHC && $valEVSEStatus!=1) {
+                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge");
+                        	$this->SetStartStop('Start');
+                          	sleep(2);
+                        }
+                    	if ($valCmdHPHC!=$valCmdIndexHC && $valEVSEStatus!=0) {
+                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
+                        	$this->SetStartStop('Stop');
+                          	sleep(2);
+                        }
+                    }
+                }
+			}
+        }
+    }
 	
 	public function GetData() {
 		
 		try {
-
           	$Mode = $this->getConfiguration("Mode");
+          
+          	if ($Mode == 1) {
+            	$this->CheckHPHC('WIFI API');
+            } else {
+            	$this->CheckHPHC('RAPI');
+            }
+          
 			$OpenEVSE_IP = $this->getConfiguration("IP");
           	$OpenEVSE_User = $this->getConfiguration("User");
           	$OpenEVSE_Password = $this->getConfiguration("Password");
@@ -433,6 +523,7 @@ class OpenEVSE extends eqLogic {
   					CURLOPT_MAXREDIRS => 10,
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  	CURLOPT_IGNORE_CONTENT_LENGTH => 136,
   					CURLOPT_CUSTOMREQUEST => 'GET',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
@@ -457,21 +548,27 @@ class OpenEVSE extends eqLogic {
              	switch (true) {
                     case ($state == 0):
                    		$this->checkAndUpdateCmd('EVSE_State', 'Unknown');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 					case ($state == 1 || $state == 2):
 						$this->checkAndUpdateCmd('EVSE_State', 'ON');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
                     	break;
                    	case ($state == 3):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Charge');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
                   	case ($state == 4 || $state == 5 || $state == 6 || $state == 7 || $state == 8 || $state == 9 || $state == 10 | $state == 11):
 						$this->checkAndUpdateCmd('EVSE_State', 'Erreur');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
                   	case ($state == 254):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 					case ($state == 255 || $state == 0):
 						$this->checkAndUpdateCmd('EVSE_State', 'OFF');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 				}
               
@@ -479,14 +576,9 @@ class OpenEVSE extends eqLogic {
 				$setPointEVSE = $json['pilot'];
 				$cmd = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
 				$setPointCMD = $cmd->execCmd();
-			
 				if ($setPointEVSE != $setPointCMD) {
 					// Set AmpSetPointReadBack value
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
-					//Refresh position of the slider
-					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-                  	$options = array('slider'=>$setPointEVSE,'update'=>'no');
-					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (WIFI API) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (WIFI API) -> Check valeur set point EVSE vs Plugin OK');
@@ -521,6 +613,7 @@ class OpenEVSE extends eqLogic {
 				// Get OpenEVSE State
               	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+              	curl_setopt($ch, CURLOPT_IGNORE_CONTENT_LENGTH, 136);
 				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GS');
 				$data = curl_exec($ch);
               
@@ -540,18 +633,21 @@ class OpenEVSE extends eqLogic {
 				switch (true) {
 					case ($arr[0] == '03'):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Charge');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] == '02' || $arr[0] == 'fe'): // || $arr[0] == 'ff'):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 					case ($arr[0] == '01'):
 						$this->checkAndUpdateCmd('EVSE_State', 'ON');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] != '00' && $arr[0] != '03'):
 						$this->checkAndUpdateCmd('EVSE_State', 'OFF');
+                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 				}
-				//$this->checkAndUpdateCmd('EVSE_State', '.'.$data.'.');
 			
 				// Get OpenEVSE Amperes Set Point
 				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GC');
@@ -671,6 +767,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('V');
 		$info->setOrder(1);
@@ -686,8 +783,9 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
-		$info->setConfiguration('minValue', 0); //$this->getConfiguration("AMin"));
-		$info->setConfiguration('maxValue', 32); //$this->getConfiguration("AMax"));
+      	$info->setTemplate('mobile','line');
+		$info->setConfiguration('minValue', 0);
+		$info->setConfiguration('maxValue', 32);
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
 		$info->setOrder(2);
@@ -703,6 +801,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('Kwh');
 		$info->setOrder(3);
@@ -718,6 +817,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
 		$info->setConfiguration('minValue', 0);
 		$info->setConfiguration('maxValue', 80);
 		$info->setIsHistorized(1);
@@ -735,11 +835,24 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('string');
 		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
 		$info->setOrder(5);
 		$info->save();
 		
+		$AMin = $this->getConfiguration("AMin");
+		$AMax = $this->getConfiguration("AMax");
+      	if (empty($AMin)) {
+			$AMin = 6;
+		}  
+		if (empty($AMax)) {
+			$AMax = 7;
+        }
+      	if ($AMax<=$AMin) {
+         	$AMax = $AMin + 1;
+        }
+      
 		$info = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
@@ -750,22 +863,15 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
-		$info->setConfiguration('minValue', $this->getConfiguration("AMin"));
-		$info->setConfiguration('maxValue', $this->getConfiguration("AMax"));
+      	$info->setTemplate('mobile','line');
+		$info->setConfiguration('minValue', $AMin);
+		$info->setConfiguration('maxValue', $AMax);
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
 		$info->setOrder(6);
 		$info->save();
 		
 		$action = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-		$AMin = $this->getConfiguration("AMin");
-		$AMax = $this->getConfiguration("AMax");
-		if (empty($AMax)) {
-			$AMax = 6;
-        }
-		if (empty($AMin)) {
-			$AMin = 6;
-		}
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_AmpSetPointSlider');
@@ -774,13 +880,17 @@ class OpenEVSE extends eqLogic {
 		$action->setType('action');
 		$action->setSubType('slider');
 	    $action->setConfiguration('stepValue', 1);
+      	$action->setValue($this->getCmd(null, 'EVSE_AmpSetPointReadBack')->getId());
+      	$action->setTemplate('dashboard','OpenEVSE::setpoint');
+		//$action->setTemplate('mobile','OpenEVSE::setpoint'); //TEMPLATE SLIDER
 		$action->setConfiguration('minValue', $AMin);
 		$action->setConfiguration('maxValue', $AMax);
 		$action->setEqLogic_id($this->getId());
 	    $action->setUnite('A');
 		$action->setDisplay("showNameOndashboard",0);
+      	$action->setDisplay("showNameOnmobile",0);
 		$action->setOrder(7);
-		$action->save();
+		$action->save();    
 					
 		$info = $this->getCmd(null, 'EVSE_State');
 		if (!is_object($info)) {
@@ -792,6 +902,7 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('string');
 		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
 		$info->setOrder(8);
@@ -807,34 +918,61 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('string');
 		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
-		$info->setIsVisible(1);
+		$info->setIsVisible(0);
 		$info->setOrder(9);
 		$info->save();
 		$this->checkAndUpdateCmd('EVSE_Mode', 'Manuel');
-		
+      
+      	$info = $this->getCmd(null, 'EVSE_Status');
+		if (!is_object($info)) {
+			$info = new OpenEVSECmd();
+			$info->setName(__('Charge : ', __FILE__));
+		}
+		$info->setLogicalId('EVSE_Status');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('binary');
+		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
+		$info->setIsHistorized(0);
+		$info->setIsVisible(0);
+		$info->setOrder(10);
+		$info->save();
+      
 		$action = $this->getCmd(null, 'EVSE_Start');
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_Start');
-			$action->setName(__('ON', __FILE__));
+			$action->setName(__('Charge_ON', __FILE__));
 		}
 		$action->setType('action');
 		$action->setSubType('other');
+      	$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
+      	$action->setTemplate('dashboard','OpenEVSE::OnOff');
+      	$action->setTemplate('mobile','OpenEVSE::OnOff');
+      	$action->setDisplay("showNameOndashboard",0);
+      	$action->setDisplay("showNameOnmobile",0);
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(10);
+		$action->setOrder(11);
 		$action->save();
-		
-		$action = $this->getCmd(null, 'EVSE_Stop');
+      
+     	$action = $this->getCmd(null, 'EVSE_Stop');
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_Stop');
-			$action->setName(__('OFF', __FILE__));
+			$action->setName(__('Charge_OFF', __FILE__));
 		}
 		$action->setType('action');
 		$action->setSubType('other');
+      	$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
+      	$action->setTemplate('dashboard','OpenEVSE::OnOff');
+      	$action->setTemplate('mobile','OpenEVSE::OnOff');
+      	$action->setDisplay("showNameOndashboard",0);
+      	$action->setDisplay("showNameOnmobile",0);
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(11);
+		$action->setOrder(12);
 		$action->save();
       
       	$Mode = $this->getConfiguration("Mode");
@@ -852,34 +990,63 @@ class OpenEVSE extends eqLogic {
           		$action->setType('action');
 				$action->setSubType('other');
 				$action->setEqLogic_id($this->getId());
-				$action->setOrder(11);
+				$action->setOrder(20);
           		$action->save();
           		log::add('OpenEVSE', 'debug','Ajout commande PAUSE (RAPI)');
             }
         }
+      
+      	$info = $this->getCmd(null, 'EVSE_ModeBin');
+		if (!is_object($info)) {
+			$info = new OpenEVSECmd();
+			$info->setName(__('ModeAuto : ', __FILE__));
+		}
+		$info->setLogicalId('EVSE_ModeBin');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('binary');
+		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
+		$info->setIsHistorized(0);
+		$info->setIsVisible(0);
+		$info->setOrder(21);
+		$info->save();
+      	$this->checkAndUpdateCmd('EVSE_ModeBin', 0);
 		
 		$action = $this->getCmd(null, 'EVSE_ModeMan');
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_ModeMan');
-			$action->setName(__('Man.', __FILE__));
+			$action->setName(__('ModeAuto_OFF', __FILE__));
 		}
 		$action->setType('action');
 		$action->setSubType('other');
+      	$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
+      	$action->setTemplate('dashboard','OpenEVSE::AutoManu');
+      	$action->setTemplate('mobile','OpenEVSE::AutoManu');
+      	$action->setDisplay("showNameOndashboard",0);
+      	$action->setDisplay("showNameOnmobile",0);
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(13);
+      	$action->setIsVisible(1);
+		$action->setOrder(22);
 		$action->save();
-		
+      
 		$action = $this->getCmd(null, 'EVSE_ModeAuto');
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_ModeAuto');
-			$action->setName(__('Auto.', __FILE__));
+			$action->setName(__('ModeAuto_ON', __FILE__));
 		}
 		$action->setType('action');
 		$action->setSubType('other');
+      	$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
+      	$action->setTemplate('dashboard','OpenEVSE::AutoManu');
+      	$action->setTemplate('mobile','OpenEVSE::AutoManu');
+      	$action->setDisplay("showNameOndashboard",0);
+      	$action->setDisplay("showNameOnmobile",0);
 		$action->setEqLogic_id($this->getId());
-		$action->setOrder(14);
+      	$action->setIsVisible(1);
+		$action->setOrder(23);
 		$action->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoString');
@@ -892,9 +1059,10 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('string');
 		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(0);
-		$info->setOrder(15);
+		$info->setOrder(24);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'EVSE_PersoNumeric');
@@ -907,9 +1075,10 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('numeric');
 		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
-		$info->setOrder(16);
+		$info->setOrder(25);
 		$info->save();
       
       	$info = $this->getCmd(null, 'EVSE_PersoBinary');
@@ -922,11 +1091,29 @@ class OpenEVSE extends eqLogic {
 		$info->setType('info');
 		$info->setSubType('binary');
 		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(0);
-		$info->setOrder(17);
+		$info->setOrder(26);
 		$info->save();
 
+    	$info = $this->getCmd(null, 'EVSE_IndexHC');
+		if (!is_object($info)) {
+			$info = new OpenEVSECmd();
+			$info->setName(__('Index HC : ', __FILE__));
+		}
+		$info->setLogicalId('EVSE_IndexHC');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('string');
+		$info->setTemplate('dashboard','default');
+      	$info->setTemplate('mobile','default');
+		$info->setIsHistorized(0);
+		$info->setIsVisible(0);
+		$info->setOrder(27);
+		$info->save();
+      
+      
 		$refresh = $this->getCmd(null, 'refresh');
 		if (!is_object($refresh)) {
 			$refresh = new OpenEVSECmd();
@@ -938,15 +1125,8 @@ class OpenEVSE extends eqLogic {
 		$refresh->setSubType('other');
 		$refresh->setOrder(50);
 		$refresh->save();
-
-    }
-
-    public function preUpdate() {
-
-    }
-
-    public function postUpdate() {
-    	foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
+      
+     	foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
 			if ($OpenEVSE->getIsEnable() == 1) {//vérifie que l'équipement est actif
 				$cmd = $OpenEVSE->getCmd(null, 'refresh');//retourne la commande "refresh si elle existe
 				if (!is_object($cmd)) {//Si la commande n'existe pas
@@ -955,6 +1135,15 @@ class OpenEVSE extends eqLogic {
 				$cmd->execCmd(); // la commande existe on la lance
 			}
 		}
+      
+    }
+
+    public function preUpdate() {
+
+    }
+
+    public function postUpdate() {
+
     }
 
     public function preRemove() {
@@ -964,6 +1153,8 @@ class OpenEVSE extends eqLogic {
     public function postRemove() {
         
     }
+  
+  	
 	
     /*
      * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
@@ -1006,12 +1197,8 @@ class OpenEVSECmd extends cmd {
 		$eqlogic = $this->getEqLogic();
 		switch ($this->getLogicalId()) {		
 			case 'EVSE_AmpSetPointSlider':
-        		$update = 1;
-               	if ($_options['update']=='no') {$update=0;}
-               	$info = $eqlogic->SetSliderSetPoint($_options['slider']/1,$update);
-            	if ($update==1) {
-                	$info = $eqlogic->GetData();
-                }
+            	$info = $eqlogic->SetSliderSetPoint($_options['slider']/1);
+            	$info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Start':
 				$cmd = $eqlogic->SetStartStop('Start');
