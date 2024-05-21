@@ -94,6 +94,7 @@ class OpenEVSE extends eqLogic {
               
               	if ($response=='') {
                   	curl_close($ch);
+			unset($ch);
                   	return;
                 }
               	
@@ -101,6 +102,7 @@ class OpenEVSE extends eqLogic {
 				if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
                   	curl_close($ch);
+			unset($ch);
                   	return;
 				}
 
@@ -123,6 +125,7 @@ class OpenEVSE extends eqLogic {
 				$response = curl_exec($ch);
 				$err = curl_error($ch);
 				curl_close($ch);
+				unset($ch);
 				if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL (WIFI API) -> ').$err;
                 } else {
@@ -142,6 +145,7 @@ class OpenEVSE extends eqLogic {
 				$response = curl_exec($ch);
               	if ($response=='') {
                   	curl_close($ch);
+			unset($ch);
                   	return;
                 }
               	curl_close($ch);
@@ -198,6 +202,7 @@ class OpenEVSE extends eqLogic {
               
               	if ($response=='') {
                   	curl_close($ch);
+			unset($ch);
                   	return;
                 }
               
@@ -205,6 +210,7 @@ class OpenEVSE extends eqLogic {
 				if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
                   	curl_close($ch);
+			unset($ch);
                   	return;
 				}
               	$json = json_decode($response, true);
@@ -239,6 +245,7 @@ class OpenEVSE extends eqLogic {
 				} else {
 					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (WIFI API) -> ' .$response);
 				}
+			unset($ch);
             } else {
               	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FD';
 				switch ($StartStop) {
@@ -267,6 +274,7 @@ class OpenEVSE extends eqLogic {
               
               	if ($response=='') {
                   	curl_close($ch);
+			unset($ch);
                   	return;
                 }
               
@@ -276,6 +284,7 @@ class OpenEVSE extends eqLogic {
 				} else {
 					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (RAPI)');
 				}
+			unset($ch);
             }
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
@@ -348,11 +357,13 @@ class OpenEVSE extends eqLogic {
                   
                   	if ($response=='') {
                   		curl_close($ch);
+				unset($ch);
                   		return;
                 	}
                   
 					$err = curl_error($ch);
 					curl_close($ch);
+					unset($ch);
 					if ($err) {
                       	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (WIFI API) -> ').$err;
                     } else {
@@ -375,6 +386,7 @@ class OpenEVSE extends eqLogic {
                   
                   	if ($response=='') {
                   		curl_close($ch);
+				unset($ch);
                   		return;
                 	}
                   
@@ -384,6 +396,7 @@ class OpenEVSE extends eqLogic {
 					} else {
                       	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (RAPI)');
 					}
+					unset($ch);
                 }
 				
 			}
@@ -532,6 +545,7 @@ class OpenEVSE extends eqLogic {
             	if ($response=='') {
                 	log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (WIFI API)');
                   	curl_close($ch);
+			unset($ch);
                   	return;
                 }
               
@@ -539,6 +553,7 @@ class OpenEVSE extends eqLogic {
 				curl_close($ch);
 				if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction GetData : State - Erreur CURL (WIFI API) -> ').$err;
+			unset($ch);
                 	return;
 				}
               	$json = json_decode($response, true);
@@ -620,6 +635,7 @@ class OpenEVSE extends eqLogic {
               	if ($data=='') {
                   	log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (RAPI)');
                  	curl_close($ch);
+			unset($ch);
                   	return;
                	}
               
@@ -654,6 +670,7 @@ class OpenEVSE extends eqLogic {
 				$data = curl_exec($ch);
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point - Erreur CURL (RAPI) -> '.curl_error($ch));
+					unset($ch);
 					return;
 				}
 				$data = $this->get_string_between($data,'OK ','^');
@@ -679,6 +696,7 @@ class OpenEVSE extends eqLogic {
 				$data = curl_exec($ch);
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Temperature - Erreur CURL (RAPI) -> '.curl_error($ch));
+					unset($ch);
 					return;
 				}
 				$data = $this->get_string_between($data,'OK ','^');
@@ -690,6 +708,7 @@ class OpenEVSE extends eqLogic {
 				$data = curl_exec($ch);
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Volts-Amperes - Erreur CURL (RAPI) -> '.curl_error($ch));
+					unset($ch);
 					return;
 				}
 				$data = $this->get_string_between($data,'OK ','^');
@@ -707,6 +726,7 @@ class OpenEVSE extends eqLogic {
 				$data = curl_exec($ch);
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Plug State - Erreur CURL (RAPI) -> '.curl_error($ch));
+					unset($ch);
 					return;
 				}
 				$data = $this->get_string_between($data,'OK ','^');
@@ -724,6 +744,7 @@ class OpenEVSE extends eqLogic {
 				$data = curl_exec($ch);
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Charge Session - Erreur CURL (RAPI) -> '.curl_error($ch));
+					unset($ch);
 					return;
 				}
 				$data = $this->get_string_between($data,'OK ','^');
@@ -731,6 +752,7 @@ class OpenEVSE extends eqLogic {
 				$this->checkAndUpdateCmd('EVSE_ChargeSession', round($arr[0]/3600000,2));
               
               	curl_close($ch);
+		unset($ch);
             }
 
 			log::add('OpenEVSE', 'debug','Fonction GetData : Récupération des données OpenEVSE OK !' );
