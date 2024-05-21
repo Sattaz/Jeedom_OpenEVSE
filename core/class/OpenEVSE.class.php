@@ -26,35 +26,35 @@ class OpenEVSE extends eqLogic {
 
    	//Fonction exécutée automatiquement toutes les minutes par Jeedom
     public static function cron() {
-		foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
-			if ($OpenEVSE->getIsEnable() == 1) {//vérifie que l'équipement est actif
-				$cmd = $OpenEVSE->getCmd(null, 'refresh');//retourne la commande "refresh si elle existe
-				if (!is_object($cmd)) {//Si la commande n'existe pas
-					continue; //continue la boucle
-				}
-				$cmd->execCmd(); // la commande existe on la lance
+	foreach (self::byType('OpenEVSE') as $OpenEVSE) {//parcours tous les équipements du plugin OpenEVSE
+		if ($OpenEVSE->getIsEnable() == 1) {//vérifie que l'équipement est actif
+			$cmd = $OpenEVSE->getCmd(null, 'refresh');//retourne la commande "refresh si elle existe
+			if (!is_object($cmd)) {//Si la commande n'existe pas
+				continue; //continue la boucle
 			}
+			$cmd->execCmd(); // la commande existe on la lance
 		}
+	}
     }
   
-  	public static function templateWidget(){
-		$return = array('info' => array('string' => array()));
+  public static function templateWidget(){
+	$return = array('info' => array('string' => array()));
      	$return['action']['other']['OnOff'] = array(
-			'template' => 'tmplicon',
-			'replace' => array(
-				'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/on.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Désactiver la charge">',
-				'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/off.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Activer la charge">'
-			)
-		);
+		'template' => 'tmplicon',
+		'replace' => array(
+			'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/on.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Désactiver la charge">',
+			'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/off.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Activer la charge">'
+		)
+	);
       	$return['action']['other']['AutoManu'] = array(
-			'template' => 'tmplicon',
-			'replace' => array(
-				'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/auto.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Auto">',
-				'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/manu.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Manuel">'
-			)
-		);
+		'template' => 'tmplicon',
+		'replace' => array(
+			'#_icon_on_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/auto.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Auto">',
+			'#_icon_off_#' => '<img class="img-responsive" src="plugins/OpenEVSE/core/img/manu.jpg" width="70" style="border-radius:10px; border:2px solid grey;margin:2px 2px" title="Mode Manuel">'
+		)
+	);
       	$return['action']['slider']['setpoint'] = array(
-            'template' => 'nooSliderOpenEVSE' //'SliderButton' //'nooSliderOpenEVSE'
+        	'template' => 'nooSliderOpenEVSE' //'SliderButton' //'nooSliderOpenEVSE'
         );
 		return $return;
 	}
@@ -65,46 +65,46 @@ class OpenEVSE extends eqLogic {
           	if ($valueSlider==0) {return;}
           
           	$Mode = $this->getConfiguration("Mode");
-			$OpenEVSE_IP = $this->getConfiguration("IP");
+		$OpenEVSE_IP = $this->getConfiguration("IP");
           	$OpenEVSE_User = $this->getConfiguration("User");
           	$OpenEVSE_Password = $this->getConfiguration("Password");
-			$ch = curl_init();
+		$ch = curl_init();
           
           	if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
             	curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
               	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            }
+	}
             
-          	//API Mode 1 is the new WIFI API
-          	//API Mode 0 is the obsolete RAPI
+	//API Mode 1 is the new WIFI API
+	//API Mode 0 is the obsolete RAPI
           
-			if ($Mode == 1) {
-              	//Get OpenEVSE State
+	if ($Mode == 1) {
+        	//Get OpenEVSE State
              	curl_setopt_array($ch, [
                   	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'GET',
-  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'GET',
+  			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
+		$response = curl_exec($ch);
               
               	if ($response=='') {
-                  	curl_close($ch);
+        		curl_close($ch);
 			unset($ch);
                   	return;
                 }
               	
-				$err = curl_error($ch);
-				if ($err) {
-                   	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
+		$err = curl_error($ch);
+		if ($err) {
+        		log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
                   	curl_close($ch);
 			unset($ch);
                   	return;
-				}
+		}
 
               	$json = json_decode($response, true);
               	$json['charge_current'] = $valueSlider;
@@ -113,92 +113,92 @@ class OpenEVSE extends eqLogic {
               	//Set State $ setpoint
             	curl_setopt_array($ch, [
                   	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'POST',
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'POST',
                   	CURLOPT_POSTFIELDS => $json,
-  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+  			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
-				$err = curl_error($ch);
-				curl_close($ch);
-				unset($ch);
-				if ($err) {
-                   	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL (WIFI API) -> ').$err;
+		$response = curl_exec($ch);
+		$err = curl_error($ch);
+		curl_close($ch);
+		unset($ch);
+		if ($err) {
+                	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL (WIFI API) -> ').$err;
                 } else {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Changement référence intensité à '.$valueSlider.' ampères (WIFI API) -> ' .$response);
                   	return $valueSlider;
-				}
-            } else {
-              curl_setopt_array($ch, [
-  					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/r?rapi=$SC%20'.$valueSlider,
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'GET',
+		}
+	} else {
+        	curl_setopt_array($ch, [
+  			CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/r?rapi=$SC%20'.$valueSlider,
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'GET',
                 ]);
-				$response = curl_exec($ch);
+		$response = curl_exec($ch);
               	if ($response=='') {
-                  	curl_close($ch);
+                	curl_close($ch);
 			unset($ch);
                   	return;
                 }
               	curl_close($ch);
-				if (curl_errno($ch)) {
-					log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL (RAPI) -> ').curl_error($ch);
-				} else {
-					log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Changement référence intensité à '.$valueSlider.' ampères (RAPI)');
+		if (curl_errno($ch)) {
+			log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Erreur CURL (RAPI) -> ').curl_error($ch);
+		} else {
+			log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : Changement référence intensité à '.$valueSlider.' ampères (RAPI)');
                   	return $valueSlider;
-				}
-            }
-		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint ' . ' ' . $e->getMessage()));
-       	}
+		}
 	}
+	} catch (Exception $e) {
+		log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetSliderSetPoint ' . ' ' . $e->getMessage()));
+       	}
+}
 	
 	public function SetStartStop($StartStop) {
 		try {
           	$Mode = $this->getConfiguration("Mode");
-			$OpenEVSE_IP = $this->getConfiguration("IP");
+		$OpenEVSE_IP = $this->getConfiguration("IP");
           	$OpenEVSE_User = $this->getConfiguration("User");
           	$OpenEVSE_Password = $this->getConfiguration("Password");
-			$ch = curl_init();
+		$ch = curl_init();
           
           	if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
-            	curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
-              	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            }
+            		curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
+              		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            	}
           
           	if ($Mode == 1) {
               	$state = 'disabled';
               	switch ($StartStop) {
-					case ('Start'):
-						$state = 'active';
-						break;
-					case ('Stop'):
-						$state = 'disabled';
-						break;
-					case ('Pause'):
-						$state = 'disabled';
-						break;                
-				}
+			case ('Start'):
+				$state = 'active';
+				break;
+			case ('Stop'):
+				$state = 'disabled';
+				break;
+			case ('Pause'):
+				$state = 'disabled';
+				break;                
+		}
               
              	curl_setopt_array($ch, [
                   	CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'GET',
-  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'GET',
+  			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
+		$response = curl_exec($ch);
               
               	if ($response=='') {
                   	curl_close($ch);
@@ -206,30 +206,30 @@ class OpenEVSE extends eqLogic {
                   	return;
                 }
               
-				$err = curl_error($ch);
-				if ($err) {
+		$err = curl_error($ch);
+		if ($err) {
                    	log::add('OpenEVSE', 'debug','Fonction SetSliderSetPoint : State - Erreur CURL (WIFI API) -> ').$err;
                   	curl_close($ch);
 			unset($ch);
                   	return;
-				}
+		}
               	$json = json_decode($response, true);
               	$json['state'] = $state;
-				$json = json_encode($json);
+		$json = json_encode($json);
               
-				curl_setopt_array($ch, [
-  					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'POST',
+		curl_setopt_array($ch, [
+  			CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/override',
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'POST',
                   	CURLOPT_POSTFIELDS => $json,
-  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+  			CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
-				$err = curl_error($ch);
+		$response = curl_exec($ch);
+		$err = curl_error($ch);
               
               	//EVSE needs to get amp setpoint once again, 2 seconds after the start of charge :-(
               	//if ($state=='active') {
@@ -241,36 +241,36 @@ class OpenEVSE extends eqLogic {
                      
               	curl_close($ch);
              	if (curl_errno($ch)) {
-					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL (WIFI API) -> ').$err;
-				} else {
-					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (WIFI API) -> ' .$response);
-				}
-			unset($ch);
-            } else {
-              	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FD';
-				switch ($StartStop) {
-					case ('Start'):
-						$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FE';
-						break;
-					case ('Stop'):
-						$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FD';
-						break;
-					case ('Pause'):
-						$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FS';
-						break;                
-				}
+			log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL (WIFI API) -> ').$err;
+		} else {
+			log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (WIFI API) -> ' .$response);
+		}
+		unset($ch);
+	} else {
+        	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FD';
+		switch ($StartStop) {
+			case ('Start'):
+				$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FE';
+				break;
+			case ('Stop'):
+				$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FD';
+				break;
+			case ('Pause'):
+				$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$FS';
+				break;                
+		}
               
               	curl_setopt_array($ch, [
-  					CURLOPT_URL => $setopt,
-  					CURLOPT_RETURNTRANSFER => true,
-  					CURLOPT_ENCODING => "",
-  					CURLOPT_MAXREDIRS => 10,
-  					CURLOPT_TIMEOUT => 10,
-  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  					CURLOPT_CUSTOMREQUEST => 'GET',
+  			CURLOPT_URL => $setopt,
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 10,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => 'GET',
                 ]);
               
-				$response = curl_exec($ch);
+		$response = curl_exec($ch);
               
               	if ($response=='') {
                   	curl_close($ch);
@@ -279,29 +279,28 @@ class OpenEVSE extends eqLogic {
                 }
               
               	curl_close($ch);
-				if (curl_errno($ch)) {
-					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL (RAPI) -> ').curl_error($ch);
-				} else {
-					log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (RAPI)');
-				}
-			unset($ch);
-            }
-		} catch (Exception $e) {
-			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
+		if (curl_errno($ch)) {
+			log::add('OpenEVSE', 'debug','Fonction SetStartStop : Erreur CURL (RAPI) -> ').curl_error($ch);
+		} else {
+			log::add('OpenEVSE', 'debug','Fonction SetStartStop : Changement valeur à '.$StartStop.' (RAPI)');
 		}
-              
+		unset($ch);
 	}
+	} catch (Exception $e) {
+		log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetStop ' . ' ' . $e->getMessage()));
+	}     
+}
 	
 	public function SetMode($SelMode) {
 		try {
 			switch ($SelMode) {
 				case 'Man':
 					$this->checkAndUpdateCmd('EVSE_Mode', 'Manuel');
-                	$this->checkAndUpdateCmd('EVSE_ModeBin', 0);
+                			$this->checkAndUpdateCmd('EVSE_ModeBin', 0);
 					break;
 				case 'Auto':
 					$this->checkAndUpdateCmd('EVSE_Mode', 'Automatique');
-                	$this->checkAndUpdateCmd('EVSE_ModeBin', 1);
+                			$this->checkAndUpdateCmd('EVSE_ModeBin', 1);
 					break;
 			}
 			log::add('OpenEVSE', 'debug','Fonction SetMode : Changement valeur à '.$SelMode);
@@ -326,87 +325,85 @@ class OpenEVSE extends eqLogic {
 			if ($RefVolts < 0 || $RefVolts > 500) {
 				log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Référence voltage depuis la commande spécifiée est incorrecte : '.$RefVolts);
 			} else {
-              	$Mode = $this->getConfiguration("Mode");
-				$setpointVolts = $RefVolts * 1000;
-				$OpenEVSE_IP = $this->getConfiguration("IP");
-              	$OpenEVSE_User = $this->getConfiguration("User");
+              		$Mode = $this->getConfiguration("Mode");
+			$setpointVolts = $RefVolts * 1000;
+			$OpenEVSE_IP = $this->getConfiguration("IP");
+              		$OpenEVSE_User = $this->getConfiguration("User");
           		$OpenEVSE_Password = $this->getConfiguration("Password");
-				$ch = curl_init();
+			$ch = curl_init();
               
-              	if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
-            		curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
-                  	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            	}
+              		if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
+            			curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
+                  		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            		}
               
           		//API Mode 1 is the new WIFI API
           		//API Mode 0 is the obsolete RAPI
           
-				if ($Mode == 1) {
-                	curl_setopt_array($ch, [
-  						CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/status',
-  						CURLOPT_RETURNTRANSFER => true,
-  						CURLOPT_ENCODING => "",
-  						CURLOPT_MAXREDIRS => 10,
-  						CURLOPT_TIMEOUT => 10,
-  						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  						CURLOPT_CUSTOMREQUEST => 'POST',
-  						CURLOPT_POSTFIELDS => '{voltage:'.$RefVolts.'}',
-  						CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                   	]);
-					$response = curl_exec($ch);
+			if ($Mode == 1) {
+                		curl_setopt_array($ch, [
+  					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/status',
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  					CURLOPT_CUSTOMREQUEST => 'POST',
+  					CURLOPT_POSTFIELDS => '{voltage:'.$RefVolts.'}',
+  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                   		]);
+				$response = curl_exec($ch);
                   
-                  	if ($response=='') {
-                  		curl_close($ch);
-				unset($ch);
-                  		return;
-                	}
-                  
-					$err = curl_error($ch);
-					curl_close($ch);
+                  		if ($response=='') {
+                  			curl_close($ch);
 					unset($ch);
-					if ($err) {
-                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (WIFI API) -> ').$err;
-                    } else {
-                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (WIFI API) -> ' .$response);
-					}
-                } else {
-                  	$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts;
+                  			return;
+                		}
                   
-                  	curl_setopt_array($ch, [
-  						CURLOPT_URL => $setopt,
-  						CURLOPT_RETURNTRANSFER => true,
-  						CURLOPT_ENCODING => "",
-  						CURLOPT_MAXREDIRS => 10,
-  						CURLOPT_TIMEOUT => 10,
-  						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  						CURLOPT_CUSTOMREQUEST => 'GET',
-                	]);
+				$err = curl_error($ch);
+				curl_close($ch);
+				unset($ch);
+				if ($err) {
+                      			log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (WIFI API) -> ').$err;
+                    		} else {
+                      			log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (WIFI API) -> ' .$response);
+				}
+                	} else {
+                  		$setopt = 'http://'.$OpenEVSE_IP.'/r?rapi=$SV%20'.$setpointVolts;
+                  		curl_setopt_array($ch, [
+  					CURLOPT_URL => $setopt,
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  					CURLOPT_CUSTOMREQUEST => 'GET',
+                		]);
 
-                  	$response = curl_exec($ch);
+                  		$response = curl_exec($ch);
                   
-                  	if ($response=='') {
-                  		curl_close($ch);
-				unset($ch);
-                  		return;
-                	}
-                  
-              		curl_close($ch);
-					if (curl_errno($ch)) {
-                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (RAPI) -> ').curl_error($ch);
-					} else {
-                      	log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (RAPI)');
-					}
+                  		if ($response=='') {
+                  			curl_close($ch);
 					unset($ch);
-                }
-				
-			}
+                  			return;
+                		}
+
+              			curl_close($ch);
+				if (curl_errno($ch)) {
+                      			log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Erreur CURL (RAPI) -> ').curl_error($ch);
+				} else {
+                      			log::add('OpenEVSE', 'debug','Fonction SetVoltageRef : Changement référence voltage à '.$RefVolts.' volts (RAPI)');
+				}
+				unset($ch);
+                	}		
+		}
 		} catch (Exception $e) {
 			log::add('OpenEVSE', 'error', __('Erreur lors de l\'éxecution de SetVoltageRef ' . ' ' . $e->getMessage()));
 		}			
 	}
   
   	public function AdjustVoltage($volts,$APIType) {
-    	// Adjust OpenEVSE Volts if Volts Reference Command value is different from charger
+    		// Adjust OpenEVSE Volts if Volts Reference Command value is different from charger
 		$sendVoltsCmd = $this->getConfiguration('sendVoltsCmd', '');
 		if (strlen($sendVoltsCmd)>0) {
 			if (is_numeric($sendVoltsCmd)) {
@@ -415,121 +412,121 @@ class OpenEVSE extends eqLogic {
 					$this->SetVoltageRef($cmdVolts);
 				}
 			} else {
-               	if (stripos($sendVoltsCmd, 'variable(') !== false && stripos($sendVoltsCmd, ')') !== false) {
-                   	$sendVoltsCmd = $this->get_string_between($sendVoltsCmd,'(',')');
-                   	$cmd = dataStore::byTypeLinkIdKey('scenario', -1, $sendVoltsCmd);
+               			if (stripos($sendVoltsCmd, 'variable(') !== false && stripos($sendVoltsCmd, ')') !== false) {
+                   			$sendVoltsCmd = $this->get_string_between($sendVoltsCmd,'(',')');
+                   			$cmd = dataStore::byTypeLinkIdKey('scenario', -1, $sendVoltsCmd);
 					if (!is_object($cmd)) {
-                       	log::add('OpenEVSE', 'debug', "Fonction GetData : Variable '{$sendVoltsCmd}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
-                    } else {
+                       				log::add('OpenEVSE', 'debug', "Fonction GetData : Variable '{$sendVoltsCmd}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
+                    			} else {
 						$cmdVolts = $cmd->getValue();
-                       	if (is_numeric($cmdVolts)) {
+                       				if (is_numeric($cmdVolts)) {
 							$cmdVolts = round($cmdVolts,0);
 							if ($volts != $cmdVolts) {
-                               	log::add('OpenEVSE', 'debug',"Fonction GetData : La variable '{$sendVoltsCmd}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
+                               					log::add('OpenEVSE', 'debug',"Fonction GetData : La variable '{$sendVoltsCmd}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
 								$this->SetVoltageRef($cmdVolts);
 							}
 						} else {
 							log::add('OpenEVSE', 'debug',"Fonction GetData : La variable '{$sendVoltsCmd}' ne retourne pas une valeur numérique ($APIType) -> ".$cmdVolts);
 						}
 					}
-               	} else {
-                   	$cmd = cmd::byId(str_replace('#', '', $sendVoltsCmd));
-               		if (!is_object($cmd)) {
+               			} else {
+                   			$cmd = cmd::byId(str_replace('#', '', $sendVoltsCmd));
+               				if (!is_object($cmd)) {
 						log::add('OpenEVSE', 'debug', "Fonction GetData : Commande '{$sendVoltsCmd}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
-					}else{
-                      	$cmdName=$cmd->getName();
+					} else {
+                      				$cmdName=$cmd->getName();
 						$cmdVolts = $cmd->execCmd();
 						if (is_numeric($cmdVolts)) {
 							$cmdVolts = round($cmdVolts,0);
 							if ($volts != $cmdVolts) {
-                               	log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$cmdName}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
+                               					log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$cmdName}' retourne une nouvelle valeur numérique ($APIType) -> ".$cmdVolts);
 								$this->SetVoltageRef($cmdVolts);
 							}
 						} else {
 							log::add('OpenEVSE', 'debug',"Fonction GetData : La commande '{$cmdName}' ne retourne pas une valeur numérique ($APIType) -> ".$cmdVolts);
 						}
 					}
-            	}
-        	}	
+            			}
+        		}	
 		}  
-    }
+    	}
   
 	public function CheckHPHC($APIType) {
-    	$sendHPHCCmd = $this->getConfiguration('sendHPHCCmd', '');
+    		$sendHPHCCmd = $this->getConfiguration('sendHPHCCmd', '');
 		if (strlen($sendHPHCCmd)>0) {
-        	$cmdHPHC = cmd::byId(str_replace('#', '', $sendHPHCCmd));
-          	if (!is_object($cmdHPHC)) {
+        		$cmdHPHC = cmd::byId(str_replace('#', '', $sendHPHCCmd));
+          		if (!is_object($cmdHPHC)) {
 				log::add('OpenEVSE', 'debug', "Fonction CheckHC : Commande '{$cmdHPHC->getName()}' non trouvée ($APIType) -> vérifiez la configuration pour  {$this->getHumanName()}.");
-			}else{
+			} else {
 				$valCmdHPHC = $cmdHPHC->execCmd();
-              	$valCmdHPHC = strtoupper($valCmdHPHC);
-              	$valCmdIndexHC = $this->getConfiguration('indexHCCmd', '');
-              	$valCmdIndexHC = strtoupper($valCmdIndexHC);
-              	$cmd = $this->getCmd(null, 'EVSE_IndexHC');
-      			$valIndexHC = $cmd->execCmd();
-              	$valIndexHC = strtoupper($valIndexHC);
-              	$cmd = $this->getCmd(null, 'EVSE_ModeBin');
-      			$valModeBin = $cmd->execCmd();
-              	if ($valCmdHPHC!=$valIndexHC) {
-                  	$cmdName=$cmdHPHC->getName();
-               		$this->checkAndUpdateCmd('EVSE_IndexHC', $valCmdHPHC);
-                  	log::add('OpenEVSE', 'debug',"Fonction CheckHC : La commande '{$cmdName}' retourne une nouvelle valeur ($APIType) -> ".$valCmdHPHC);
-                  	if ($valModeBin==1) { 
-                  		if ($valCmdHPHC==$valCmdIndexHC) {
-                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge"); 
-                   			$this->SetStartStop('Start');
-                    	} else {
-                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
-                  			$this->SetStartStop('Stop');
-                    	}
-                  		sleep(2);
-                    }
-                } else {
-                	if($valModeBin==1) {
-                    	$cmd = $this->getCmd(null, 'EVSE_Status');
-      					$valEVSEStatus = $cmd->execCmd();
-                      	if ($valCmdHPHC==$valCmdIndexHC && $valEVSEStatus!=1) {
-                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge");
-                        	$this->SetStartStop('Start');
-                          	sleep(2);
-                        }
-                    	if ($valCmdHPHC!=$valCmdIndexHC && $valEVSEStatus!=0) {
-                          	log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
-                        	$this->SetStartStop('Stop');
-                          	sleep(2);
-                        }
-                    }
-                }
+              			$valCmdHPHC = strtoupper($valCmdHPHC);
+              			$valCmdIndexHC = $this->getConfiguration('indexHCCmd', '');
+              			$valCmdIndexHC = strtoupper($valCmdIndexHC);
+              			$cmd = $this->getCmd(null, 'EVSE_IndexHC');
+      				$valIndexHC = $cmd->execCmd();
+              			$valIndexHC = strtoupper($valIndexHC);
+              			$cmd = $this->getCmd(null, 'EVSE_ModeBin');
+      				$valModeBin = $cmd->execCmd();
+              			if ($valCmdHPHC!=$valIndexHC) {
+                  			$cmdName=$cmdHPHC->getName();
+               				$this->checkAndUpdateCmd('EVSE_IndexHC', $valCmdHPHC);
+                  			log::add('OpenEVSE', 'debug',"Fonction CheckHC : La commande '{$cmdName}' retourne une nouvelle valeur ($APIType) -> ".$valCmdHPHC);
+                  			if ($valModeBin==1) { 
+                  				if ($valCmdHPHC==$valCmdIndexHC) {
+                          				log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge"); 
+                   					$this->SetStartStop('Start');
+                    				} else {
+                          				log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
+                  					$this->SetStartStop('Stop');
+                    				}
+                  				sleep(2);
+                    			}
+                		} else {
+                			if($valModeBin==1) {
+                    				$cmd = $this->getCmd(null, 'EVSE_Status');
+      						$valEVSEStatus = $cmd->execCmd();
+                      				if ($valCmdHPHC==$valCmdIndexHC && $valEVSEStatus!=1) {
+                          				log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> activation charge");
+                        				$this->SetStartStop('Start');
+                          				sleep(2);
+                        			}
+                    				if ($valCmdHPHC!=$valCmdIndexHC && $valEVSEStatus!=0) {
+                          				log::add('OpenEVSE', 'debug',"Fonction CheckHC : Mode Start/Stop automatique actif ($APIType) -> ".$valCmdHPHC." -> désactivation charge");
+                        				$this->SetStartStop('Stop');
+                          				sleep(2);
+                        			}
+                    			}
+                		}
 			}
-        }
-    }
+        	}
+    	}
 	
 	public function GetData() {
 		
 		try {
-          	$Mode = $this->getConfiguration("Mode");
+          		$Mode = $this->getConfiguration("Mode");
           
-          	if ($Mode == 1) {
-            	$this->CheckHPHC('WIFI API');
-            } else {
-            	$this->CheckHPHC('RAPI');
-            }
+          		if ($Mode == 1) {
+            			$this->CheckHPHC('WIFI API');
+            		} else {
+            			$this->CheckHPHC('RAPI');
+            		}
           
 			$OpenEVSE_IP = $this->getConfiguration("IP");
-          	$OpenEVSE_User = $this->getConfiguration("User");
-          	$OpenEVSE_Password = $this->getConfiguration("Password");
+          		$OpenEVSE_User = $this->getConfiguration("User");
+          		$OpenEVSE_Password = $this->getConfiguration("Password");
 			$ch = curl_init();
 			          
-          	if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
-            	curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
-              	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            }
-        	//API Mode 1 is the new WIFI API
-          	//API Mode 0 is the obsolete RAPI
+          		if ($OpenEVSE_User!='' && $OpenEVSE_Password!='') {
+            			curl_setopt($ch, CURLOPT_USERPWD, $OpenEVSE_User.':'.$OpenEVSE_Password);
+              			curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            		}
+        		//API Mode 1 is the new WIFI API
+          		//API Mode 0 is the obsolete RAPI
           
 			if ($Mode == 1) {              
-              	//Get all other data
-              	curl_setopt_array($ch, [
+              			//Get all other data
+              			curl_setopt_array($ch, [
   					CURLOPT_URL => 'http://'.$OpenEVSE_IP.'/status',
   					CURLOPT_RETURNTRANSFER => true,
   					CURLOPT_ENCODING => "",
@@ -539,55 +536,55 @@ class OpenEVSE extends eqLogic {
                   			CURLOPT_IGNORE_CONTENT_LENGTH => 136,
   					CURLOPT_CUSTOMREQUEST => 'GET',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                ]);
+                		]);
 				$response = curl_exec($ch);
               
-            	if ($response=='') {
-                	log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (WIFI API)');
-                  	curl_close($ch);
-			unset($ch);
-                  	return;
-                }
+            			if ($response=='') {
+                			log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (WIFI API)');
+                  			curl_close($ch);
+					unset($ch);
+                  			return;
+                		}
               
 				$err = curl_error($ch);
 				curl_close($ch);
 				if ($err) {
-                   	log::add('OpenEVSE', 'debug','Fonction GetData : State - Erreur CURL (WIFI API) -> ').$err;
-			unset($ch);
-                	return;
+                   			log::add('OpenEVSE', 'debug','Fonction GetData : State - Erreur CURL (WIFI API) -> ').$err;
+					unset($ch);
+                			return;
 				}
-              	$json = json_decode($response, true);
+              			$json = json_decode($response, true);
               
-              	// Get OpenEVSE State
+              			// Get OpenEVSE State
   				$state = $json['state'];
-             	switch (true) {
-                    case ($state == 0):
-                   		$this->checkAndUpdateCmd('EVSE_State', 'Unknown');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+             			switch (true) {
+                    			case ($state == 0):
+                   				$this->checkAndUpdateCmd('EVSE_State', 'Unknown');
+                    				$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 					case ($state == 1 || $state == 2):
 						$this->checkAndUpdateCmd('EVSE_State', 'ON');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
-                    	break;
-                   	case ($state == 3):
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				break;
+                   			case ($state == 3):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Charge');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
-                  	case ($state == 4 || $state == 5 || $state == 6 || $state == 7 || $state == 8 || $state == 9 || $state == 10 | $state == 11):
+                  			case ($state == 4 || $state == 5 || $state == 6 || $state == 7 || $state == 8 || $state == 9 || $state == 10 | $state == 11):
 						$this->checkAndUpdateCmd('EVSE_State', 'Erreur');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
-                  	case ($state == 254):
+                  			case ($state == 254):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($state == 255 || $state == 0):
 						$this->checkAndUpdateCmd('EVSE_State', 'OFF');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 				}
               
-              	// Get OpenEVSE Amperes Set Point
+              			// Get OpenEVSE Amperes Set Point
 				$setPointEVSE = $json['pilot'];
 				$cmd = $this->getCmd(null, 'EVSE_AmpSetPointReadBack');
 				$setPointCMD = $cmd->execCmd();
@@ -599,18 +596,18 @@ class OpenEVSE extends eqLogic {
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (WIFI API) -> Check valeur set point EVSE vs Plugin OK');
 				}
               
-              	// Get OpenEVSE Temperature
+              			// Get OpenEVSE Temperature
 				$temp = $json['temp'];
 				$this->checkAndUpdateCmd('EVSE_Temp', round($temp/10,0));
               
-              	// Get OpenEVSE Actual Volts & Amperes
+              			// Get OpenEVSE Actual Volts & Amperes
 				$amperes = round($json['amp']/1000,1);
 				$volts = round($json['voltage'],0);
 				$this->checkAndUpdateCmd('EVSE_Amperes', $amperes);
 				$this->checkAndUpdateCmd('EVSE_Volts', $volts);
               
 				// Adjust OpenEVSE Volts if Volts Reference Command value is different from charger
-              	$this->AdjustVoltage($volts,'WIFI API');
+              			$this->AdjustVoltage($volts,'WIFI API');
 				          
 				//Get OpenEVSE Plug State
 				$connectstate = $json['vehicle'];
@@ -624,20 +621,20 @@ class OpenEVSE extends eqLogic {
 				$chargesession = $json['wattsec'];
 				$this->checkAndUpdateCmd('EVSE_ChargeSession', round($chargesession/3600000,2));
               
-            } else {
+            		} else {
 				// Get OpenEVSE State
-              	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+              			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-              	curl_setopt($ch, CURLOPT_IGNORE_CONTENT_LENGTH, 136);
+              			curl_setopt($ch, CURLOPT_IGNORE_CONTENT_LENGTH, 136);
 				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$GS');
 				$data = curl_exec($ch);
               
-              	if ($data=='') {
-                  	log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (RAPI)');
-                 	curl_close($ch);
-			unset($ch);
-                  	return;
-               	}
+              			if ($data=='') {
+                  			log::add('OpenEVSE', 'debug','Fonction GetData : Erreur de connexion / authentification (RAPI)');
+                 			curl_close($ch);
+					unset($ch);
+                  			return;
+               			}
               
 				if (curl_errno($ch)) {
 					log::add('OpenEVSE', 'debug','Fonction GetData : State - Erreur CURL (RAPI) -> '.curl_error($ch));
@@ -649,19 +646,19 @@ class OpenEVSE extends eqLogic {
 				switch (true) {
 					case ($arr[0] == '03'):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Charge');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] == '02' || $arr[0] == 'fe'): // || $arr[0] == 'ff'):
 						$this->checkAndUpdateCmd('EVSE_State', 'En Pause');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] == '01'):
 						$this->checkAndUpdateCmd('EVSE_State', 'ON');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 1);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 1);
 						break;
 					case ($arr[0] != '00' && $arr[0] != '03'):
 						$this->checkAndUpdateCmd('EVSE_State', 'OFF');
-                    	$this->checkAndUpdateCmd('EVSE_Status', 0);
+                    				$this->checkAndUpdateCmd('EVSE_Status', 0);
 						break;
 				}
 			
@@ -684,7 +681,7 @@ class OpenEVSE extends eqLogic {
 					$this->checkAndUpdateCmd('EVSE_AmpSetPointReadBack', $setPointEVSE);
 					//Refresh position of the slider
 					$cmdAmpSetPointSlider = $this->getCmd(null, 'EVSE_AmpSetPointSlider');
-                  	$options = array('slider'=>$setPointEVSE,'update'=>'no');
+                  			$options = array('slider'=>$setPointEVSE,'update'=>'no');
 					$cmdAmpSetPointSlider->execCmd($options, $cache=0);
 					log::add('OpenEVSE', 'debug','Fonction GetData : Amperes Set Point (RAPI) -> Rafraîchissement valeur set point intensité à '.$setPointEVSE. ' ampères');
 				} else {
@@ -719,7 +716,7 @@ class OpenEVSE extends eqLogic {
 				$this->checkAndUpdateCmd('EVSE_Volts', $volts);
 			
 				// Adjust OpenEVSE Volts if Volts Reference Command value is different from charger
-              	$this->AdjustVoltage($volts,'RAPI');
+              			$this->AdjustVoltage($volts,'RAPI');
 			
 				//Get OpenEVSE Plug State
 				curl_setopt($ch, CURLOPT_URL, 'http://'.$OpenEVSE_IP.'/r?rapi=$G0');
@@ -751,10 +748,9 @@ class OpenEVSE extends eqLogic {
 				$arr = explode(" ", $data);
 				$this->checkAndUpdateCmd('EVSE_ChargeSession', round($arr[0]/3600000,2));
               
-              	curl_close($ch);
-		unset($ch);
-            }
-
+              			curl_close($ch);
+				unset($ch);
+           		}
 			log::add('OpenEVSE', 'debug','Fonction GetData : Récupération des données OpenEVSE OK !' );
 			return;
 		} catch (Exception $e) {
@@ -1239,23 +1235,23 @@ class OpenEVSECmd extends cmd {
 		$eqlogic = $this->getEqLogic();
 		switch ($this->getLogicalId()) {		
 			case 'EVSE_AmpSetPointSlider':
-            	$info = $eqlogic->SetSliderSetPoint($_options['slider']/1);
-            	$info = $eqlogic->GetData();
+            			$info = $eqlogic->SetSliderSetPoint($_options['slider']/1);
+            			$info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Start':
 				$cmd = $eqlogic->SetStartStop('Start');
-            	sleep(2);
-                $info = $eqlogic->GetData();
+            			sleep(2);
+                		$info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Stop':
 				$cmd = $eqlogic->SetStartStop('Stop');
-            	sleep(2);
-                $info = $eqlogic->GetData();
+            			sleep(2);
+                		$info = $eqlogic->GetData();
 				break;
 			case 'EVSE_Pause':
 				$cmd = $eqlogic->SetStartStop('Pause');
-            	sleep(2);
-                $info = $eqlogic->GetData();
+            			sleep(2);
+                		$info = $eqlogic->GetData();
 				break;
 			case 'EVSE_ModeMan':
 				$cmd = $eqlogic->SetMode('Man');
