@@ -761,16 +761,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Tension : ', __FILE__));
+			$info->setLogicalId('EVSE_Volts');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setIsHistorized(1);
+			$info->setUnite('V');
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Volts');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setIsHistorized(1);
-		$info->setUnite('V');
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(1);
 		$info->save();
 		
@@ -778,18 +778,18 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Intensité : ', __FILE__));
+			$info->setLogicalId('EVSE_Amperes');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setConfiguration('minValue', 0);
+			$info->setConfiguration('maxValue', 32);
+			$info->setIsHistorized(1);
+			$info->setUnite('A');
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Amperes');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      	$info->setTemplate('mobile','line');
-		$info->setConfiguration('minValue', 0);
-		$info->setConfiguration('maxValue', 32);
-		$info->setIsHistorized(1);
-		$info->setUnite('A');
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(2);
 		$info->save();
 		
@@ -797,16 +797,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Charge Session : ', __FILE__));
+			$info->setLogicalId('EVSE_ChargeSession');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setIsHistorized(1);
+			$info->setUnite('Kwh');
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_ChargeSession');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setIsHistorized(1);
-		$info->setUnite('Kwh');
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(3);
 		$info->save();
 		
@@ -814,18 +814,18 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Température : ', __FILE__));
+			$info->setLogicalId('EVSE_Temp');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setConfiguration('minValue', 0);
+			$info->setConfiguration('maxValue', 80);
+			$info->setIsHistorized(1);
+			$info->setUnite('°C');
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Temp');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setConfiguration('minValue', 0);
-		$info->setConfiguration('maxValue', 80);
-		$info->setIsHistorized(1);
-		$info->setUnite('°C');
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(4);
 		$info->save();
 		
@@ -833,16 +833,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Prise : ', __FILE__));
+			$info->setLogicalId('EVSE_Plug');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('string');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(1);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Plug');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('string');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(1);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(5);
 		$info->save();
 		
@@ -862,18 +862,18 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Consigne Demandée : ', __FILE__));
+			$info->setLogicalId('EVSE_AmpSetPointReadBack');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setConfiguration('minValue', $AMin);
+			$info->setConfiguration('maxValue', $AMax);
+			$info->setIsHistorized(1);
+			$info->setUnite('A');
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_AmpSetPointReadBack');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setConfiguration('minValue', $AMin);
-		$info->setConfiguration('maxValue', $AMax);
-		$info->setIsHistorized(1);
-		$info->setUnite('A');
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(6);
 		$info->save();
 		
@@ -882,20 +882,20 @@ class OpenEVSE extends eqLogic {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_AmpSetPointSlider');
 			$action->setName(__('Curseur Consigne', __FILE__));
+			$action->setType('action');
+			$action->setSubType('slider');
+	   		$action->setConfiguration('stepValue', 1);
+      			$action->setValue($this->getCmd(null, 'EVSE_AmpSetPointReadBack')->getId());
+      			$action->setTemplate('dashboard','OpenEVSE::setpoint');
+			//$action->setTemplate('mobile','OpenEVSE::setpoint'); //TEMPLATE SLIDER
+			$action->setConfiguration('minValue', $AMin);
+			$action->setConfiguration('maxValue', $AMax);
+			$action->setEqLogic_id($this->getId());
+	    		$action->setUnite('A');
+			$action->setDisplay("showNameOndashboard",0);
+      			$action->setDisplay("showNameOnmobile",0);
+	    		$action->setDisplay('forceReturnLineAfter',1);
 		}
-		$action->setType('action');
-		$action->setSubType('slider');
-	   	$action->setConfiguration('stepValue', 1);
-      		$action->setValue($this->getCmd(null, 'EVSE_AmpSetPointReadBack')->getId());
-      		$action->setTemplate('dashboard','OpenEVSE::setpoint');
-		//$action->setTemplate('mobile','OpenEVSE::setpoint'); //TEMPLATE SLIDER
-		$action->setConfiguration('minValue', $AMin);
-		$action->setConfiguration('maxValue', $AMax);
-		$action->setEqLogic_id($this->getId());
-	    	$action->setUnite('A');
-		$action->setDisplay("showNameOndashboard",0);
-      		$action->setDisplay("showNameOnmobile",0);
-	    	$action->setDisplay('forceReturnLineAfter',1);
 		$action->setOrder(7);
 		$action->save();    
 					
@@ -903,16 +903,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Etat : ', __FILE__));
+			$info->setLogicalId('EVSE_State');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('string');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(1);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_State');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('string');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(1);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(8);
 		$info->save();
 		
@@ -920,34 +920,34 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Mode : ', __FILE__));
+			$info->setLogicalId('EVSE_Mode');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('string');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(0);
+	    		//$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Mode');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('string');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
-		$info->setOrder(9);
+	    	$info->setOrder(9);
 		$info->save();
 		$this->checkAndUpdateCmd('EVSE_Mode', 'Manuel');
       
-      	$info = $this->getCmd(null, 'EVSE_Status');
+      		$info = $this->getCmd(null, 'EVSE_Status');
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Charge : ', __FILE__));
+			$info->setLogicalId('EVSE_Status');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('binary');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(0);
+	    		//$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_Status');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('binary');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(10);
 		$info->save();
       
@@ -956,73 +956,73 @@ class OpenEVSE extends eqLogic {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_Start');
 			$action->setName(__('Charge_ON', __FILE__));
+			$action->setType('action');
+			$action->setSubType('other');
+      			$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
+      			$action->setTemplate('dashboard','OpenEVSE::OnOff');
+      			$action->setTemplate('mobile','OpenEVSE::OnOff');
+      			$action->setDisplay("showNameOndashboard",0);
+      			$action->setDisplay("showNameOnmobile",0);
+	    		//$action->setDisplay('forceReturnLineAfter',1);
+			$action->setEqLogic_id($this->getId());
 		}
-		$action->setType('action');
-		$action->setSubType('other');
-      		$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
-      		$action->setTemplate('dashboard','OpenEVSE::OnOff');
-      		$action->setTemplate('mobile','OpenEVSE::OnOff');
-      		$action->setDisplay("showNameOndashboard",0);
-      		$action->setDisplay("showNameOnmobile",0);
-	    	$action->setDisplay('forceReturnLineAfter',1);
-		$action->setEqLogic_id($this->getId());
 		$action->setOrder(11);
 		$action->save();
       
-     	$action = $this->getCmd(null, 'EVSE_Stop');
+     		$action = $this->getCmd(null, 'EVSE_Stop');
 		if (!is_object($action)) {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_Stop');
 			$action->setName(__('Charge_OFF', __FILE__));
+			$action->setType('action');
+			$action->setSubType('other');
+      			$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
+      			$action->setTemplate('dashboard','OpenEVSE::OnOff');
+      			$action->setTemplate('mobile','OpenEVSE::OnOff');
+      			$action->setDisplay("showNameOndashboard",0);
+      			$action->setDisplay("showNameOnmobile",0);
+	    		//$action->setDisplay('forceReturnLineAfter',1);
+			$action->setEqLogic_id($this->getId());
 		}
-		$action->setType('action');
-		$action->setSubType('other');
-      		$action->setValue($this->getCmd(null, 'EVSE_Status')->getId());
-      		$action->setTemplate('dashboard','OpenEVSE::OnOff');
-      		$action->setTemplate('mobile','OpenEVSE::OnOff');
-      		$action->setDisplay("showNameOndashboard",0);
-      		$action->setDisplay("showNameOnmobile",0);
-	    	$action->setDisplay('forceReturnLineAfter',1);
-		$action->setEqLogic_id($this->getId());
 		$action->setOrder(12);
 		$action->save();
       
       		$Mode = $this->getConfiguration("Mode");
      		$action = $this->getCmd(null, 'EVSE_Pause');
 		if (is_object($action)) {
-        	if ($Mode == 1) {
-			$action->remove();
-              		log::add('OpenEVSE', 'debug','Suppression commande PAUSE (WIFI API)');
-           	}
-        } else {
-        	if ($Mode == 0) {
-  			$action = new OpenEVSECmd();
-			$action->setLogicalId('EVSE_Pause');
-			$action->setName(__('PAUSE', __FILE__));
-          		$action->setType('action');
-			$action->setSubType('other');
-			$action->setEqLogic_id($this->getId());
-			$action->setDisplay('forceReturnLineAfter',1);
-			$action->setOrder(20);
-          		$action->save();
-          		log::add('OpenEVSE', 'debug','Ajout commande PAUSE (RAPI)');
-            	}
-        }
+        		if ($Mode == 1) {
+				$action->remove();
+              			log::add('OpenEVSE', 'debug','Suppression commande PAUSE (WIFI API)');
+           		}
+        	} else {
+        		if ($Mode == 0) {
+  				$action = new OpenEVSECmd();
+				$action->setLogicalId('EVSE_Pause');
+				$action->setName(__('PAUSE', __FILE__));
+          			$action->setType('action');
+				$action->setSubType('other');
+				$action->setEqLogic_id($this->getId());
+				//$action->setDisplay('forceReturnLineAfter',1);
+				$action->setOrder(20);
+          			$action->save();
+          			log::add('OpenEVSE', 'debug','Ajout commande PAUSE (RAPI)');
+            		}
+        	}
       
       		$info = $this->getCmd(null, 'EVSE_ModeBin');
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('ModeAuto : ', __FILE__));
+			$info->setLogicalId('EVSE_ModeBin');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('binary');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(0);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_ModeBin');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('binary');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(21);
 		$info->save();
       		$this->checkAndUpdateCmd('EVSE_ModeBin', 0);
@@ -1032,17 +1032,17 @@ class OpenEVSE extends eqLogic {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_ModeMan');
 			$action->setName(__('ModeAuto_OFF', __FILE__));
+			$action->setType('action');
+			$action->setSubType('other');
+      			$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
+      			$action->setTemplate('dashboard','OpenEVSE::AutoManu');
+      			$action->setTemplate('mobile','OpenEVSE::AutoManu');
+      			$action->setDisplay("showNameOndashboard",0);
+      			$action->setDisplay("showNameOnmobile",0);
+	    		$action->setDisplay('forceReturnLineAfter',1);
+			$action->setEqLogic_id($this->getId());
+      			$action->setIsVisible(1);
 		}
-		$action->setType('action');
-		$action->setSubType('other');
-      		$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
-      		$action->setTemplate('dashboard','OpenEVSE::AutoManu');
-      		$action->setTemplate('mobile','OpenEVSE::AutoManu');
-      		$action->setDisplay("showNameOndashboard",0);
-      		$action->setDisplay("showNameOnmobile",0);
-	    	$action->setDisplay('forceReturnLineAfter',1);
-		$action->setEqLogic_id($this->getId());
-      		$action->setIsVisible(1);
 		$action->setOrder(22);
 		$action->save();
       
@@ -1051,17 +1051,17 @@ class OpenEVSE extends eqLogic {
 			$action = new OpenEVSECmd();
 			$action->setLogicalId('EVSE_ModeAuto');
 			$action->setName(__('ModeAuto_ON', __FILE__));
+			$action->setType('action');
+			$action->setSubType('other');
+      			$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
+      			$action->setTemplate('dashboard','OpenEVSE::AutoManu');
+      			$action->setTemplate('mobile','OpenEVSE::AutoManu');
+      			$action->setDisplay("showNameOndashboard",0);
+      			$action->setDisplay("showNameOnmobile",0);
+	    		$action->setDisplay('forceReturnLineAfter',1);
+			$action->setEqLogic_id($this->getId());
+      			$action->setIsVisible(1);
 		}
-		$action->setType('action');
-		$action->setSubType('other');
-      		$action->setValue($this->getCmd(null, 'EVSE_ModeBin')->getId());
-      		$action->setTemplate('dashboard','OpenEVSE::AutoManu');
-      		$action->setTemplate('mobile','OpenEVSE::AutoManu');
-      		$action->setDisplay("showNameOndashboard",0);
-      		$action->setDisplay("showNameOnmobile",0);
-	    	$action->setDisplay('forceReturnLineAfter',1);
-		$action->setEqLogic_id($this->getId());
-      		$action->setIsVisible(1);
 		$action->setOrder(23);
 		$action->save();
 		
@@ -1069,16 +1069,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Perso. Texte', __FILE__));
+			$info->setLogicalId('EVSE_PersoString');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('string');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(0);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_PersoString');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('string');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(24);
 		$info->save();
 		
@@ -1086,16 +1086,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Perso. Num.', __FILE__));
+			$info->setLogicalId('EVSE_PersoNumeric');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('numeric');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setIsHistorized(1);
+			$info->setIsVisible(0);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_PersoNumeric');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('numeric');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setIsHistorized(1);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(25);
 		$info->save();
       
@@ -1103,16 +1103,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Perso. Bin.', __FILE__));
+			$info->setLogicalId('EVSE_PersoBinary');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('binary');
+			$info->setTemplate('dashboard','line');
+      			$info->setTemplate('mobile','line');
+			$info->setIsHistorized(1);
+			$info->setIsVisible(0);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_PersoBinary');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('binary');
-		$info->setTemplate('dashboard','line');
-      		$info->setTemplate('mobile','line');
-		$info->setIsHistorized(1);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(26);
 		$info->save();
 
@@ -1120,16 +1120,16 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($info)) {
 			$info = new OpenEVSECmd();
 			$info->setName(__('Index HC : ', __FILE__));
+			$info->setLogicalId('EVSE_IndexHC');
+			$info->setEqLogic_id($this->getId());
+			$info->setType('info');
+			$info->setSubType('string');
+			$info->setTemplate('dashboard','default');
+      			$info->setTemplate('mobile','default');
+			$info->setIsHistorized(0);
+			$info->setIsVisible(0);
+	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
-		$info->setLogicalId('EVSE_IndexHC');
-		$info->setEqLogic_id($this->getId());
-		$info->setType('info');
-		$info->setSubType('string');
-		$info->setTemplate('dashboard','default');
-      		$info->setTemplate('mobile','default');
-		$info->setIsHistorized(0);
-		$info->setIsVisible(0);
-	    	$info->setDisplay('forceReturnLineAfter',1);
 		$info->setOrder(27);
 		$info->save();
       
@@ -1138,11 +1138,11 @@ class OpenEVSE extends eqLogic {
 		if (!is_object($refresh)) {
 			$refresh = new OpenEVSECmd();
 			$refresh->setName(__('Rafraîchir', __FILE__));
+			$refresh->setEqLogic_id($this->getId());
+			$refresh->setLogicalId('refresh');
+			$refresh->setType('action');
+			$refresh->setSubType('other');
 		}
-		$refresh->setEqLogic_id($this->getId());
-		$refresh->setLogicalId('refresh');
-		$refresh->setType('action');
-		$refresh->setSubType('other');
 		$refresh->setOrder(50);
 		$refresh->save();
       
