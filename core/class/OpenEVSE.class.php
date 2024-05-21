@@ -910,14 +910,14 @@ class OpenEVSE extends eqLogic {
       			$action->setValue($this->getCmd(null, 'EVSE_AmpSetPointReadBack')->getId());
       			$action->setTemplate('dashboard','OpenEVSE::setpoint');
 			//$action->setTemplate('mobile','OpenEVSE::setpoint'); //TEMPLATE SLIDER
-			$action->setConfiguration('minValue', $AMin);
-			$action->setConfiguration('maxValue', $AMax);
 			$action->setEqLogic_id($this->getId());
 	    		$action->setUnite('A');
 			$action->setDisplay("showNameOndashboard",0);
       			$action->setDisplay("showNameOnmobile",0);
 	    		$action->setDisplay('forceReturnLineAfter',1);
 		}
+	    	$action->setConfiguration('minValue', $AMin);
+		$action->setConfiguration('maxValue', $AMax);
 		$action->setOrder(7);
 		$action->save();    
 					
