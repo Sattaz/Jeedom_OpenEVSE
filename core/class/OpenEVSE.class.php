@@ -890,12 +890,12 @@ class OpenEVSE extends eqLogic {
 			$info->setSubType('numeric');
 			$info->setTemplate('dashboard','line');
       			$info->setTemplate('mobile','line');
-			$info->setConfiguration('minValue', $AMin);
-			$info->setConfiguration('maxValue', $AMax);
 			$info->setIsHistorized(1);
 			$info->setUnite('A');
 	    		$info->setDisplay('forceReturnLineAfter',1);
 		}
+	    	$info->setConfiguration('minValue', $AMin);
+		$info->setConfiguration('maxValue', $AMax);
 		$info->setOrder(6);
 		$info->save();
 		
