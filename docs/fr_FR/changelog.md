@@ -1,3 +1,8 @@
+* 21-Mai-2024:
+
+Adaptation Jeedom v4.4.x
+Corrections de bugs.
+
 * 15-Mai-2023:
 
 Ajout de l'option d'historisation dans la configuration de l'équipement.
