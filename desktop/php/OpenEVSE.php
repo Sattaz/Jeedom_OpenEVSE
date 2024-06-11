@@ -194,6 +194,14 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 							</div>
+                          	<div class="form-group">
+								<label class="col-sm-3 control-label">{{Désactivation mode charge}}</label>
+								<div class="col-sm-6">
+                                	<div class="input-group CA-cmd-el">
+										<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="disableCharge" />{{Désactiver le mode de charge si le câble est debranché}}</label>
+									</div>
+                                </div>
+							</div>
 							<div class="form-group">
 							<label class="col-sm-3 control-label">{{Commande ajustement tension (V)}}</label>
 							<div class="col-sm-6">
