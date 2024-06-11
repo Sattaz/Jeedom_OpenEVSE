@@ -22,4 +22,15 @@ if (!isConnect()) {
     die();
 }
 ?>
-
+<form class="form-horizontal">
+	<fieldset>
+		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Fréquence de rafraîchissement}} <sub>(s.)</sub>
+				<sup><i class="fas fa-question-circle tooltips" title="{{Délai en secondes entre 2 interrogations. 30 par défaut}}"></i></sup>
+			</label>
+			<div class="col-sm-6">
+				<input type="number" min="0" step="1" class="configKey form-control" data-l1key="pollInterval" onkeydown="if(event.key==='.'||event.key===','||event.key==='+'||event.key==='-'){event.preventDefault();}" oninput="event.target.value=event.target.value.replace(/\D/,'');" />
+			</div>
+		</div>
+	</fieldset>
+</form>
