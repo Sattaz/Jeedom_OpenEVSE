@@ -1,4 +1,4 @@
-* 11-Juin-2024
+* 08-Octobre-2024
 
 Ajout d'un deamon PHP permettant de définir le temps des cycles de rafraîchissement des informations.
 
