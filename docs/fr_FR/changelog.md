@@ -1,3 +1,11 @@
+* 08-Octobre-2024
+
+Ajout d'un deamon PHP permettant de définir le temps des cycles de rafraîchissement des informations.
+
+Le chargeur reste désormais en mode manuel et dans l'état ou il se trouve lors d'un arrêt de la charge.
+
+Ajout d'une option pour désactiver le mode de charge (vers OFF) si le câble de charge est débranché.
+
 * 21-Mai-2024:
 
 Adaptation Jeedom v4.4.x
